@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesiDirect - My Account</title>
+    <meta name="description" content="Manage your DesiDirect account, orders, and personal details.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* ===== Account Page Styles ===== */
+        body { background: #f4f0eb; }
+
+        /* ---- Hero Banner ---- */
+        .acc-hero {
+            position: relative;
+            min-height: 280px;
+            background: linear-gradient(135deg, #2F4F4F 0%, #1a3232 40%, #3d2b1f 100%);
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            padding: 0 6% 0;
+            margin-top: 80px; /* nav height */
+        }
+        .acc-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(226,114,91,0.25) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(244,164,96,0.15) 0%, transparent 50%);
+        }
+        /* Decorative mandala SVG pattern */
+        .acc-hero-pattern {
+            position: absolute;
+            right: -60px;
+            top: -60px;
+            width: 420px;
+            height: 420px;
+            opacity: 0.07;
+        }
+        /* Floating orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            pointer-events: none;
+        }
+        .orb-1 { width: 200px; height: 200px; background: rgba(226,114,91,0.4); top: -40px; left: 30%; }
+        .orb-2 { width: 140px; height: 140px; background: rgba(244,164,96,0.3); bottom: 0; right: 20%; }
+
+        /* ---- Profile Card ---- */
+        .acc-profile-card {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: flex-end;
+            gap: 2rem;
+            padding-bottom: 0;
+            width: 100%;
+        }
+        .acc-avatar-wrap {
+            position: relative;
+            flex-shrink: 0;
+            margin-bottom: -40px;
+        }
+        .acc-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E2725B, #F4A460);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: white;
+            border: 4px solid white;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            user-select: none;
+        }
+        .acc-avatar-edit {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 28px;
+            height: 28px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-size: 0.75rem;
+            color: #666;
+            transition: background 0.2s, color 0.2s;
+        }
+        .acc-avatar-edit:hover { background: #E2725B; color: white; }
+        .acc-hero-info {
+            padding-bottom: 1.5rem;
+            flex: 1;
+        }
+        .acc-hero-info h1 {
+            font-size: 1.9rem;
+            color: white;
+            margin-bottom: 0.2rem;
+            font-family: 'Outfit', sans-serif;
+        }
+        .acc-hero-info p { color: rgba(255,255,255,0.65); font-size: 0.92rem; }
+        .acc-role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+        }
+        .acc-role-badge.customer {
+            background: rgba(244,164,96,0.25);
+            color: #F4A460;
+            border: 1px solid rgba(244,164,96,0.4);
+        }
+
+        /* ---- Main Layout ---- */
+        .acc-layout {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3.5rem 2rem 5rem;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* ---- Sidebar ---- */
+        .acc-sidebar {
+            position: sticky;
+            top: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            background: white;
+            border-radius: 20px;
+            padding: 1.25rem 0.75rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        }
+        .acc-sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #555;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            text-decoration: none;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+        }
+        .acc-sidebar-item i { font-size: 1.2rem; color: #bbb; transition: color 0.2s; }
+        .acc-sidebar-item:hover, .acc-sidebar-item.active {
+            background: rgba(47,79,79,0.07);
+            color: var(--primary-color);
+        }
+        .acc-sidebar-item:hover i, .acc-sidebar-item.active i { color: var(--primary-color); }
+        .acc-sidebar-item.danger { color: #E2725B; }
+        .acc-sidebar-item.danger i { color: #E2725B; }
+        .acc-sidebar-item.danger:hover { background: rgba(226,114,91,0.07); }
+        .acc-sidebar-divider { height: 1px; background: rgba(0,0,0,0.06); margin: 0.5rem 0; }
+
+        /* ---- Content Area ---- */
+        .acc-content { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        /* ---- Stats Row ---- */
+        .acc-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .acc-stat {
+            background: white;
+            border-radius: 18px;
+            padding: 1.4rem 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .acc-stat:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.09); }
+        .acc-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .acc-stat-icon.green  { background: rgba(47,79,79,0.1);  color: #2F4F4F; }
+        .acc-stat-icon.orange { background: rgba(226,114,91,0.12); color: #E2725B; }
+        .acc-stat-icon.gold   { background: rgba(244,164,96,0.15); color: #d4880a; }
+        .acc-stat-info p { font-size: 0.78rem; color: #999; margin-bottom: 0.15rem; }
+        .acc-stat-info h3 { font-size: 1.5rem; color: var(--primary-color); font-family: 'Outfit', sans-serif; }
+
+        /* ---- Section Card ---- */
+        .acc-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.75rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .acc-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .acc-card-header h2 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .acc-card-header h2 i { color: var(--secondary-color); font-size: 1.3rem; }
+        .acc-link {
+            font-size: 0.83rem;
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .acc-link:hover { opacity: 0.7; }
+
+        /* ---- Profile Form ---- */
+        .acc-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+        .acc-form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+        .acc-form-group label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .acc-form-group input, .acc-form-group select {
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #eee;
+            border-radius: 12px;
+            font-size: 0.93rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: #fafafa;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        .acc-form-group input:focus, .acc-form-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(47,79,79,0.07);
+            background: white;
+        }
+        .acc-form-group input[readonly] { background: #f5f5f5; color: #999; cursor: not-allowed; }
+        .acc-form-note { font-size: 0.75rem; color: #bbb; margin-top: 0.2rem; }
+        .acc-save-btn {
+            margin-top: 1.5rem;
+            padding: 0.65rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .acc-save-btn:hover {
+            background: #233b3b;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(47,79,79,0.25);
+        }
+        .acc-save-msg {
+            display: none;
+            color: #2ecc71;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* ---- Orders ---- */
+        .order-empty {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: #bbb;
+        }
+        .order-empty i { font-size: 3rem; display: block; margin-bottom: 0.75rem; opacity: 0.4; }
+        .order-empty p { font-size: 0.92rem; }
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .order-item:last-child { border-bottom: none; }
+        .order-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(47,79,79,0.07);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+        .order-info { flex: 1; }
+        .order-info h4 { font-size: 0.93rem; color: var(--primary-color); margin-bottom: 0.2rem; }
+        .order-info p { font-size: 0.8rem; color: #aaa; }
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .order-status.delivered { background: rgba(46,204,113,0.12); color: #2ecc71; }
+        .order-status.processing { background: rgba(244,164,96,0.15); color: #d4880a; }
+
+        /* ---- Wishlist ---- */
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .wishlist-item {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1.5px solid #f0f0f0;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .wishlist-item:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); transform: translateY(-2px); }
+        .wishlist-item-img {
+            height: 100px;
+            background: linear-gradient(135deg, #f5ede8, #e8f0ee);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        .wishlist-item-info { padding: 0.75rem; }
+        .wishlist-item-info p { font-size: 0.78rem; color: #888; }
+        .wishlist-item-info h4 { font-size: 0.85rem; color: var(--primary-color); font-weight: 600; margin-bottom: 0.1rem; }
+        .wishlist-item-info span { font-size: 0.82rem; color: var(--secondary-color); font-weight: 700; }
+
+        /* ---- Password Section ---- */
+        .acc-password-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+        /* ---- Danger Zone ---- */
+        .danger-zone {
+            border: 1.5px solid rgba(226,114,91,0.2);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            background: rgba(226,114,91,0.02);
+        }
+        .danger-zone h3 { font-size: 0.95rem; color: var(--primary-color); margin-bottom: 0.2rem; }
+        .danger-zone p { font-size: 0.82rem; color: #aaa; }
+        .danger-btn {
+            padding: 0.6rem 1.4rem;
+            border-radius: 10px;
+            border: 1.5px solid #E2725B;
+            background: none;
+            color: #E2725B;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            transition: background 0.2s, color 0.2s;
+        }
+        .danger-btn:hover { background: #E2725B; color: white; }
+
+        /* ---- Responsive ---- */
+        @media(max-width: 900px) {
+            .acc-layout { grid-template-columns: 1fr; }
+            .acc-sidebar { position: static; flex-direction: row; flex-wrap: wrap; gap: 0.25rem; padding: 0.75rem; }
+            .acc-stats { grid-template-columns: 1fr 1fr; }
+            .acc-form-grid { grid-template-columns: 1fr; }
+            .acc-password-grid { grid-template-columns: 1fr; }
+            .wishlist-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media(max-width: 600px) {
+            .acc-hero { padding: 0 4% 0; }
+            .acc-hero-info h1 { font-size: 1.4rem; }
+            .acc-avatar { width: 80px; height: 80px; font-size: 2rem; }
+            .acc-stats { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Global Navigation -->
+    <nav class="glass-nav scrolled">
+        <a href="index.html" class="logo" style="text-decoration:none;">
+            <img src="assets/images/logo.png" alt="DesiDirect" style="height:120px; width:auto; mix-blend-mode:multiply; object-fit:contain; transform:scale(1.2);">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="marketplace.html">Discover</a>
+            <a href="artisans.html">Artisans</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">Our Story</a>
+        </div>
+        <div class="nav-actions">
+            <i class='bx bx-search'></i>
+            <a href="cart.html" style="color:inherit; text-decoration:none; position:relative; margin-right:1rem;">
+                <i class='bx bx-shopping-bag'></i>
+            </a>
+            <a href="login.html" class="cta-button primary" style="text-decoration:none; padding:0.5rem 1.25rem; background-color:red; border-color:red;">Sign In</a>
+        </div>
+    </nav>
+
+    <!-- ===== Hero Banner ===== -->
+    <div class="acc-hero">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+
+        <!-- Decorative mandala pattern -->
+        <svg class="acc-hero-pattern" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="200" cy="200" r="180" fill="none" stroke="white" stroke-width="1"/>
+            <circle cx="200" cy="200" r="140" fill="none" stroke="white" stroke-width="1"/>
+            <circle cx="200" cy="200" r="100" fill="none" stroke="white" stroke-width="1"/>
+            <circle cx="200" cy="200" r="60" fill="none" stroke="white" stroke-width="1"/>
+            <line x1="200" y1="20" x2="200" y2="380" stroke="white" stroke-width="0.5"/>
+            <line x1="20" y1="200" x2="380" y2="200" stroke="white" stroke-width="0.5"/>
+            <line x1="73" y1="73" x2="327" y2="327" stroke="white" stroke-width="0.5"/>
+            <line x1="327" y1="73" x2="73" y2="327" stroke="white" stroke-width="0.5"/>
+            <line x1="200" y1="20" x2="380" y2="310" stroke="white" stroke-width="0.3"/>
+            <line x1="200" y1="20" x2="20" y2="310" stroke="white" stroke-width="0.3"/>
+            <line x1="380" y1="130" x2="20" y2="310" stroke="white" stroke-width="0.3"/>
+            <line x1="380" y1="270" x2="20" y2="90" stroke="white" stroke-width="0.3"/>
+            <circle cx="200" cy="20" r="5" fill="white" opacity="0.5"/>
+            <circle cx="200" cy="380" r="5" fill="white" opacity="0.5"/>
+            <circle cx="20" cy="200" r="5" fill="white" opacity="0.5"/>
+            <circle cx="380" cy="200" r="5" fill="white" opacity="0.5"/>
+            <circle cx="73" cy="73" r="5" fill="white" opacity="0.5"/>
+            <circle cx="327" cy="327" r="5" fill="white" opacity="0.5"/>
+            <circle cx="327" cy="73" r="5" fill="white" opacity="0.5"/>
+            <circle cx="73" cy="327" r="5" fill="white" opacity="0.5"/>
+        </svg>
+
+        <div class="acc-profile-card">
+            <div class="acc-avatar-wrap">
+                <div class="acc-avatar" id="heroAvatar">U</div>
+                <div class="acc-avatar-edit" title="Change photo"><i class='bx bx-camera'></i></div>
+            </div>
+            <div class="acc-hero-info">
+                <h1 id="heroName">My Account</h1>
+                <p id="heroEmail">Loading…</p>
+                <div class="acc-role-badge customer" id="heroBadge">
+                    <i class='bx bx-user'></i> Customer
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Main Layout ===== -->
+    <div class="acc-layout">
+
+        <!-- Sidebar nav -->
+        <aside class="acc-sidebar">
+            <a class="acc-sidebar-item active" href="#profile" onclick="showSection('profile', this)">
+                <i class='bx bx-user-circle'></i> Profile Info
+            </a>
+            <a class="acc-sidebar-item" href="#orders" onclick="showSection('orders', this)">
+                <i class='bx bx-package'></i> My Orders
+            </a>
+            <a class="acc-sidebar-item" href="#wishlist" onclick="showSection('wishlist', this)">
+                <i class='bx bx-heart'></i> Wishlist
+            </a>
+            <a class="acc-sidebar-item" href="#security" onclick="showSection('security', this)">
+                <i class='bx bx-lock-alt'></i> Security
+            </a>
+            <div class="acc-sidebar-divider"></div>
+            <button class="acc-sidebar-item danger" onclick="logout(event)">
+                <i class='bx bx-log-out'></i> Log Out
+            </button>
+        </aside>
+
+        <!-- Right content -->
+        <div class="acc-content">
+
+            <!-- Stats -->
+            <div class="acc-stats">
+                <div class="acc-stat">
+                    <div class="acc-stat-icon green"><i class='bx bx-package'></i></div>
+                    <div class="acc-stat-info">
+                        <p>Total Orders</p>
+                        <h3 id="statOrders">0</h3>
+                    </div>
+                </div>
+                <div class="acc-stat">
+                    <div class="acc-stat-icon orange"><i class='bx bx-heart'></i></div>
+                    <div class="acc-stat-info">
+                        <p>Wishlist Items</p>
+                        <h3>0</h3>
+                    </div>
+                </div>
+                <div class="acc-stat">
+                    <div class="acc-stat-icon gold"><i class='bx bx-coin-stack'></i></div>
+                    <div class="acc-stat-info">
+                        <p>Total Spent</p>
+                        <h3>₹0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PROFILE SECTION ===== -->
+            <div class="acc-card" id="section-profile">
+                <div class="acc-card-header">
+                    <h2><i class='bx bx-edit-alt'></i> Profile Information</h2>
+                </div>
+                <div class="acc-form-grid">
+                    <div class="acc-form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="fieldName" placeholder="Your full name">
+                    </div>
+                    <div class="acc-form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="fieldEmail" readonly placeholder="your@email.com">
+                        <span class="acc-form-note">Email cannot be changed here.</span>
+                    </div>
+                    <div class="acc-form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="fieldPhone" placeholder="+91 98765 43210">
+                    </div>
+                    <div class="acc-form-group">
+                        <label>City / Location</label>
+                        <input type="text" id="fieldCity" placeholder="Mumbai, India">
+                    </div>
+                    <div class="acc-form-group" style="grid-column: 1 / -1;">
+                        <label>Delivery Address</label>
+                        <input type="text" id="fieldAddress" placeholder="Flat / Building, Street, City, Pincode">
+                    </div>
+                </div>
+                <button class="acc-save-btn" onclick="saveProfile()">
+                    <i class='bx bx-save'></i> Save Changes
+                </button>
+                <div class="acc-save-msg" id="profileSaveMsg">✅ Profile updated successfully!</div>
+            </div>
+
+            <!-- ===== ORDERS SECTION ===== -->
+            <div class="acc-card" id="section-orders" style="display:none;">
+                <div class="acc-card-header">
+                    <h2><i class='bx bx-shopping-bag'></i> My Orders</h2>
+                    <a href="marketplace.html" class="acc-link">Shop Now →</a>
+                </div>
+                <div id="ordersList">
+                    <!-- Sample order items (replace with real data) -->
+                    <div class="order-item" id="sampleOrder1" style="display:none;">
+                        <div class="order-icon"><i class='bx bx-package'></i></div>
+                        <div class="order-info">
+                            <h4>Handwoven Dhokra Necklace</h4>
+                            <p>Ordered on 25 Mar 2026 · ₹1,200</p>
+                        </div>
+                        <span class="order-status delivered">Delivered</span>
+                    </div>
+                    <div class="order-item" id="sampleOrder2" style="display:none;">
+                        <div class="order-icon"><i class='bx bx-box'></i></div>
+                        <div class="order-info">
+                            <h4>Block Print Cotton Dupatta</h4>
+                            <p>Ordered on 28 Mar 2026 · ₹750</p>
+                        </div>
+                        <span class="order-status processing">Processing</span>
+                    </div>
+                    <div class="order-empty" id="emptyOrders">
+                        <i class='bx bx-package'></i>
+                        <p style="font-weight:600; color:#888; margin-bottom:0.4rem;">No orders yet</p>
+                        <p>Discover handcrafted products made with love by rural artisans.</p>
+                        <a href="marketplace.html" class="acc-save-btn" style="margin-top:1rem; display:inline-flex; text-decoration:none;">
+                            Start Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== WISHLIST SECTION ===== -->
+            <div class="acc-card" id="section-wishlist" style="display:none;">
+                <div class="acc-card-header">
+                    <h2><i class='bx bx-heart'></i> Wishlist</h2>
+                    <a href="marketplace.html" class="acc-link">Browse Products →</a>
+                </div>
+                <div class="wishlist-grid" id="wishlistGrid">
+                    <!-- Sample wishlist items -->
+                    <div class="wishlist-item">
+                        <div class="wishlist-item-img">🧵</div>
+                        <div class="wishlist-item-info">
+                            <h4>Silk Patola Scarf</h4>
+                            <p>By Rekha Patel</p>
+                            <span>₹2,400</span>
+                        </div>
+                    </div>
+                    <div class="wishlist-item">
+                        <div class="wishlist-item-img">🏺</div>
+                        <div class="wishlist-item-info">
+                            <h4>Blue Pottery Vase</h4>
+                            <p>By Ramesh Kumhar</p>
+                            <span>₹880</span>
+                        </div>
+                    </div>
+                    <div class="wishlist-item">
+                        <div class="wishlist-item-img">🌿</div>
+                        <div class="wishlist-item-info">
+                            <h4>Organic Turmeric Set</h4>
+                            <p>By Gita Farms</p>
+                            <span>₹450</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SECURITY SECTION ===== -->
+            <div class="acc-card" id="section-security" style="display:none;">
+                <div class="acc-card-header">
+                    <h2><i class='bx bx-shield-alt-2'></i> Security</h2>
+                </div>
+                <p style="font-size:0.88rem; color:#999; margin-bottom:1.5rem;">
+                    Change your password. Make sure it's at least 6 characters.
+                </p>
+                <div class="acc-password-grid">
+                    <div class="acc-form-group">
+                        <label>Current Password</label>
+                        <input type="password" id="currPass" placeholder="••••••••">
+                    </div>
+                    <div class="acc-form-group">
+                        <label>New Password</label>
+                        <input type="password" id="newPass" placeholder="••••••••">
+                    </div>
+                    <div class="acc-form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" id="confPass" placeholder="••••••••">
+                    </div>
+                </div>
+                <button class="acc-save-btn" onclick="changePassword()" style="margin-top:1.25rem;">
+                    <i class='bx bx-lock'></i> Update Password
+                </button>
+                <div class="acc-save-msg" id="passMsg"></div>
+
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #f0f0f0;">
+                    <div class="acc-card-header" style="margin-bottom: 0.5rem;">
+                        <h2 style="font-size:1rem; color:#888;"><i class='bx bx-info-circle' style="color:#ccc;"></i> Account</h2>
+                    </div>
+                    <div class="danger-zone">
+                        <div>
+                            <h3>Delete Account</h3>
+                            <p>Permanently remove your account and all associated data. This action cannot be undone.</p>
+                        </div>
+                        <button class="danger-btn">Delete Account</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="glass-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <img src="assets/images/logo.png" alt="DesiDirect" style="height:120px; width:auto; mix-blend-mode:multiply; object-fit:contain; transform:scale(1.2);">
+                </div>
+                <p>Bringing the soul of rural craftsmanship to the modern world.</p>
+                <div class="social-links">
+                    <a href="#"><i class='bx bxl-instagram'></i></a>
+                    <a href="#"><i class='bx bxl-twitter'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Shop</h4>
+                <a href="products.html">Ceramics</a>
+                <a href="products.html">Textiles</a>
+                <a href="products.html">Home Decor</a>
+                <a href="products.html">Organic Pantry</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="about.html">About Us</a>
+                <a href="artisans.html">Our Artisans</a>
+                <a href="about.html">Sustainability</a>
+                <a href="#">Careers</a>
+            </div>
+            <div class="footer-subscribe">
+                <h4>Stay Connected</h4>
+                <p>Get updates on new collections and artisan stories.</p>
+                <div class="subscribe-form">
+                    <input type="email" placeholder="Your email address">
+                    <button><i class='bx bx-send'></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 DesiDirect Marketplace. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        // ---- Load user from localStorage ----
+        const PROFILE_KEY = 'desi_profile';
+        const user = JSON.parse(localStorage.getItem('desi_user') || '{}');
+
+        // If not logged in, redirect to login
+        if (!user.email) {
+            window.location.href = 'login.html';
+        }
+
+        // Populate hero
+        if (user.name) {
+            document.getElementById('heroAvatar').textContent = user.name.charAt(0).toUpperCase();
+            document.getElementById('heroName').textContent   = user.name;
+        }
+        if (user.email) {
+            document.getElementById('heroEmail').textContent = user.email;
+        }
+        if (user.role === 'producer') {
+            document.getElementById('heroBadge').innerHTML = "<i class='bx bx-store'></i> Producer";
+        }
+
+        // Populate form fields
+        const saved = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+        document.getElementById('fieldName').value    = user.name   || '';
+        document.getElementById('fieldEmail').value   = user.email  || '';
+        document.getElementById('fieldPhone').value   = saved.phone   || '';
+        document.getElementById('fieldCity').value    = saved.city    || '';
+        document.getElementById('fieldAddress').value = saved.address || '';
+
+        // ---- Section switching ----
+        function showSection(id, el) {
+            // Hide all sections
+            document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
+            // Show target
+            const target = document.getElementById('section-' + id);
+            if (target) target.style.display = 'block';
+            // Update sidebar active state
+            document.querySelectorAll('.acc-sidebar-item').forEach(i => i.classList.remove('active'));
+            if (el) el.classList.add('active');
+            // Prevent page jump
+            if (event) event.preventDefault();
+        }
+
+        // ---- Save Profile ----
+        function saveProfile() {
+            const name    = document.getElementById('fieldName').value.trim();
+            const phone   = document.getElementById('fieldPhone').value.trim();
+            const city    = document.getElementById('fieldCity').value.trim();
+            const address = document.getElementById('fieldAddress').value.trim();
+
+            if (!name) { alert('Name cannot be empty.'); return; }
+
+            // Update user name in localStorage
+            user.name = name;
+            localStorage.setItem('desi_user', JSON.stringify(user));
+
+            // Save extended profile
+            localStorage.setItem(PROFILE_KEY, JSON.stringify({ phone, city, address }));
+
+            // Update hero
+            document.getElementById('heroAvatar').textContent = name.charAt(0).toUpperCase();
+            document.getElementById('heroName').textContent   = name;
+
+            const msg = document.getElementById('profileSaveMsg');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        }
+
+        // ---- Change Password (UI only — wire to Firebase for real impl) ----
+        function changePassword() {
+            const curr = document.getElementById('currPass').value;
+            const np   = document.getElementById('newPass').value;
+            const cp   = document.getElementById('confPass').value;
+            const msg  = document.getElementById('passMsg');
+
+            if (!curr || !np || !cp) { showPassMsg('Please fill all password fields.', 'red'); return; }
+            if (np.length < 6)        { showPassMsg('New password must be at least 6 characters.', 'red'); return; }
+            if (np !== cp)            { showPassMsg('New passwords do not match.', 'red'); return; }
+
+            // TODO: Wire to Firebase Auth updatePassword()
+            showPassMsg('✅ Password updated successfully!', '#2ecc71');
+            document.getElementById('currPass').value = '';
+            document.getElementById('newPass').value  = '';
+            document.getElementById('confPass').value = '';
+        }
+
+        function showPassMsg(text, color) {
+            const msg = document.getElementById('passMsg');
+            msg.textContent   = text;
+            msg.style.color   = color;
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3500);
+        }
+    </script>
+    <script type="module" src="js/auth-sync.js"></script>
+</body>
+</html>

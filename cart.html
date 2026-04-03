@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesiDirect - Your Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <!-- Global Navigation -->
+    <nav class="glass-nav scrolled">
+        <a href="index.html" class="logo" style="text-decoration:none;">
+            <img src="assets/images/logo.png" alt="DesiDirect" style="height: 120px; width: auto; mix-blend-mode: multiply; object-fit: contain; transform: scale(1.2);">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="marketplace.html">Discover</a>
+            <a href="artisans.html">Artisans</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">Our Story</a>
+        </div>
+        <div class="nav-actions">
+            <i class='bx bx-search'></i>
+            <a href="cart.html" style="color:inherit; text-decoration:none; position:relative; margin-right:1rem;">
+                <i class='bx bx-shopping-bag'></i>
+                <span id="navCartBadge" style="position:absolute; top:-5px; right:-10px; background:var(--secondary-color); color:white; font-size:0.6rem; border-radius:50%; width:18px; height:18px; display:none; align-items:center; justify-content:center; font-weight:bold;"></span>
+            </a>
+            <a href="login.html" class="cta-button primary" style="text-decoration:none; padding:0.5rem 1.25rem; background-color:red; border-color:red;">Sign In</a>
+        </div>
+    </nav>
+
+    <div class="page-layout" style="background:var(--background-light);">
+        <div class="flow-container">
+            <h2 id="cartTitle" style="font-size:2.5rem; color:var(--primary-color); margin-bottom:2rem;">Your Cart</h2>
+
+            <div class="checkout-grid" id="cartGrid">
+
+                <!-- Cart Items (rendered by JS) -->
+                <div class="cart-items glass-panel" style="padding:1rem;" id="cartItemsList">
+                    <!-- populated by JS -->
+                </div>
+
+                <!-- Order Summary -->
+                <div class="summary-card" id="cartSummaryCard">
+                    <h3 style="margin-bottom:1.5rem; color:var(--primary-color);">Order Summary</h3>
+
+                    <div class="summary-row">
+                        <span id="subtotalLabel">Subtotal (0 items)</span>
+                        <span id="subtotalValue">₹0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span>Calculated at checkout</span>
+                    </div>
+
+                    <div class="summary-total">
+                        <span>Total Estimate</span>
+                        <span id="totalValue">₹0.00</span>
+                    </div>
+
+                    <button class="cta-button primary glow" style="width:100%; margin-top:2rem;"
+                        onclick="window.location.href='payment.html'">
+                        Proceed to Checkout
+                    </button>
+                    <button class="cta-button outline" style="width:100%; margin-top:1rem; border:none; background:transparent;"
+                        onclick="window.location.href='marketplace.html'">
+                        Continue Shopping
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="glass-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <img src="assets/images/logo.png" alt="DesiDirect" style="height: 120px; width: auto; mix-blend-mode: multiply; object-fit: contain; transform: scale(1.2);">
+                </div>
+                <p>Bringing the soul of rural craftsmanship to the modern world.</p>
+                <div class="social-links">
+                    <a href="#"><i class='bx bxl-instagram'></i></a>
+                    <a href="#"><i class='bx bxl-twitter'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Shop</h4>
+                <a href="products.html">Ceramics</a>
+                <a href="products.html">Textiles</a>
+                <a href="products.html">Home Decor</a>
+                <a href="products.html">Organic Pantry</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="about.html">About Us</a>
+                <a href="artisans.html">Our Artisans</a>
+                <a href="about.html">Sustainability</a>
+                <a href="#">Careers</a>
+            </div>
+            <div class="footer-subscribe">
+                <h4>Stay Connected</h4>
+                <p>Get updates on new collections and artisan stories.</p>
+                <div class="subscribe-form">
+                    <input type="email" placeholder="Your email address">
+                    <button><i class='bx bx-send'></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 DesiDirect Marketplace. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        // ==========================================
+        //  Cart  – localStorage key: desi_cart
+        //  Each item: { id, productName, price, image, artisanName, qty }
+        // ==========================================
+
+        const CART_KEY = 'desi_cart';
+
+        function loadCart() {
+            try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); }
+            catch { return []; }
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        }
+
+        function getTotalQty(cart) {
+            return cart.reduce((s, i) => s + i.qty, 0);
+        }
+
+        function getSubtotal(cart) {
+            return cart.reduce((s, i) => s + i.price * i.qty, 0);
+        }
+
+        // ---- Update quantity ----
+        function changeQty(id, delta) {
+            const cart = loadCart();
+            const idx  = cart.findIndex(i => i.id === id);
+            if (idx === -1) return;
+            cart[idx].qty = Math.max(1, cart[idx].qty + delta);
+            saveCart(cart);
+            renderCart();
+        }
+
+        // ---- Remove item ----
+        function removeItem(id) {
+            const cart = loadCart().filter(i => i.id !== id);
+            saveCart(cart);
+            renderCart();
+        }
+
+        // ---- Render cart ----
+        function renderCart() {
+            const cart        = loadCart();
+            const list        = document.getElementById('cartItemsList');
+            const totalQty    = getTotalQty(cart);
+            const subtotal    = getSubtotal(cart);
+
+            // Update title & badge
+            document.getElementById('cartTitle').textContent =
+                `Your Cart (${totalQty} item${totalQty !== 1 ? 's' : ''})`;
+            document.getElementById('subtotalLabel').textContent = `Subtotal (${totalQty} items)`;
+            document.getElementById('subtotalValue').textContent = `₹${subtotal.toLocaleString('en-IN')}.00`;
+            document.getElementById('totalValue').textContent    = `₹${subtotal.toLocaleString('en-IN')}.00`;
+
+            // Nav badge
+            const badge = document.getElementById('navCartBadge');
+            if (totalQty > 0) {
+                badge.textContent    = totalQty;
+                badge.style.display  = 'flex';
+            } else {
+                badge.style.display  = 'none';
+            }
+
+            // Empty state
+            if (cart.length === 0) {
+                document.getElementById('cartGrid').innerHTML = `
+                    <div class="glass-panel" style="padding:3rem; text-align:center; grid-column:1/-1;">
+                        <i class='bx bx-shopping-bag' style="font-size:4rem; color:var(--secondary-color); display:block; margin-bottom:1rem;"></i>
+                        <h3 style="margin-bottom:1rem; color:var(--primary-color);">Your cart is empty</h3>
+                        <p style="margin-bottom:2rem; color:#666;">You haven't added any products yet.</p>
+                        <button class="cta-button primary glow" onclick="window.location.href='marketplace.html'">
+                            Start Shopping
+                        </button>
+                    </div>`;
+                return;
+            }
+
+            // Render items
+            list.innerHTML = cart.map((item, idx) => {
+                const imgHTML = item.image
+                    ? `<img src="${item.image}" alt="${item.productName}"
+                           style="width:80px;height:80px;object-fit:cover;border-radius:12px;flex-shrink:0;">`
+                    : `<div style="width:80px;height:80px;background:#f5ede8;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;">🛍️</div>`;
+
+                return `
+                <div class="cart-item" style="${idx === cart.length - 1 ? 'border-bottom:none;' : ''}">
+                    ${imgHTML}
+                    <div class="cart-item-details">
+                        <h4>${item.productName}</h4>
+                        <p style="color:#666; font-size:0.85rem;">By ${item.artisanName}</p>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">
+                            <div class="cart-item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}</div>
+                            <div class="quantity-picker" style="transform:scale(0.85); transform-origin:left center;">
+                                <button onclick="changeQty(${item.id}, -1)">-</button>
+                                <input type="text" value="${item.qty}" readonly>
+                                <button onclick="changeQty(${item.id}, 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="removeItem(${item.id})"
+                        style="border:none; background:transparent; color:#E2725B; font-size:1.5rem; cursor:pointer;"
+                        aria-label="Remove item">
+                        <i class='bx bx-trash'></i>
+                    </button>
+                </div>`;
+            }).join('');
+        }
+
+        // Init on load
+        document.addEventListener('DOMContentLoaded', renderCart);
+    </script>
+    <script src="js/app.js"></script>
+    <script src="js/animations.js"></script>
+    <script type="module" src="js/auth-sync.js"></script>
+</body>
+</html>

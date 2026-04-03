@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesiDirect - Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+    <!-- Simple Navigation for Checkout Flow -->
+        <!-- Global Navigation -->
+    <nav class="glass-nav scrolled">
+        <a href="index.html" class="logo" style="text-decoration:none;">
+            <img src="assets/images/logo.png" alt="DesiDirect" style="height: 120px; width: auto; mix-blend-mode: multiply; object-fit: contain; transform: scale(1.2);">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="marketplace.html">Discover</a>
+            <a href="artisans.html">Artisans</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">Our Story</a>
+        </div>
+        <div class="nav-actions">
+            <i class='bx bx-search'></i>
+            <a href="cart.html" style="color:inherit; text-decoration:none; position:relative; margin-right:1rem;">
+                <i class='bx bx-shopping-bag'></i>
+                <span style="position:absolute; top:-5px; right:-10px; background:var(--secondary-color); color:white; font-size:0.6rem; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-weight: bold;">2</span>
+            </a>
+            <a href="login.html" class="cta-button primary" style="text-decoration:none; padding: 0.5rem 1.25rem; background-color: red; border-color: red;">Sign In</a>
+        </div>
+    </nav>
+
+    <div class="page-layout" style="background:#f9f9f9;">
+        <div class="flow-container">
+            
+            <div class="checkout-grid">
+                
+                <!-- Shipping Form -->
+                <div class="glass-panel" style="padding:2.5rem; background:white;">
+                    <h3 style="font-size:1.5rem; color:var(--primary-color); margin-bottom:2rem;">1. Shipping Information</h3>
+                    
+                    <form action="payment.html">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" required placeholder="Ex: Aditi Sharma">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" required placeholder="+91 99999 99999">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Delivery Address</label>
+                            <textarea required placeholder="House/Flat No., Building Name, Street" rows="3"></textarea>
+                        </div>
+                        
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" required placeholder="Mumbai">
+                            </div>
+                            <div class="form-group">
+                                <label>Pincode</label>
+                                <input type="text" required placeholder="400001">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>State</label>
+                            <select required>
+                                <option value="">Select State</option>
+                                <option>Maharashtra</option>
+                                <option>Gujarat</option>
+                                <option>Delhi</option>
+                                <option>Karnataka</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="cta-button primary glow" style="width:100%; margin-top:1rem; padding:1rem;">Continue to Payment</button>
+                    </form>
+                </div>
+
+                <!-- Order Summary Widget -->
+                <div class="summary-card">
+                    <h3 style="margin-bottom:1.5rem; color:var(--primary-color);">Order Summary</h3>
+                    
+                    <!-- Minified cart items -->
+                    <div style="display:flex; justify-content:space-between; margin-bottom:1rem; font-size:0.9rem;">
+                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                            <span style="background:#eee; border-radius:50%; width:20px; height:20px; display:flex; justify-content:center; align-items:center; font-size:0.75rem;">2</span>
+                            <span>Handcrafted Clay Pot</span>
+                        </div>
+                        <span>₹700.00</span>
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-between; margin-bottom:1.5rem; font-size:0.9rem;">
+                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                            <span style="background:#eee; border-radius:50%; width:20px; height:20px; display:flex; justify-content:center; align-items:center; font-size:0.75rem;">1</span>
+                            <span>Premium Heritage Millet</span>
+                        </div>
+                        <span>₹450.00</span>
+                    </div>
+
+                    <div style="border-top:1px solid #eee; padding-top:1.5rem;">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span>₹1,150.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping Fee</span>
+                            <span>₹80.00</span>
+                        </div>
+                        
+                        <div class="summary-total">
+                            <span>Total (INR)</span>
+                            <span>₹1,230.00</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Global Footer -->
+    <footer class="glass-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <img src="assets/images/logo.png" alt="DesiDirect" style="height: 120px; width: auto; mix-blend-mode: multiply; object-fit: contain; transform: scale(1.2);">
+                </div>
+                <p>Bringing the soul of rural craftsmanship to the modern world.</p>
+                <div class="social-links">
+                    <a href="#"><i class='bx bxl-instagram'></i></a>
+                    <a href="#"><i class='bx bxl-twitter'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Shop</h4>
+                <a href="products.html">Ceramics</a>
+                <a href="products.html">Textiles</a>
+                <a href="products.html">Home Decor</a>
+                <a href="products.html">Organic Pantry</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="about.html">About Us</a>
+                <a href="artisans.html">Our Artisans</a>
+                <a href="about.html">Sustainability</a>
+                <a href="#">Careers</a>
+            </div>
+            <div class="footer-subscribe">
+                <h4>Stay Connected</h4>
+                <p>Get updates on new collections and artisan stories.</p>
+                <div class="subscribe-form">
+                    <input type="email" placeholder="Your email address">
+                    <button><i class='bx bx-send'></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 DesiDirect Marketplace. All rights reserved.</p>
+        </div>
+    </footer>
+    <script type="module" src="js/auth-sync.js"></script>
+</body>
+</html>

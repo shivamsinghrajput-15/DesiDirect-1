@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesiDirect - Modern Rural Marketplace</title>
+    <meta name="description"
+        content="Connect directly with village artisans. Shop handmade pottery, woven baskets, organic food, and traditional fabrics.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <!-- Boxicons for modern icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+
+    <!-- Particle canvas for background effects -->
+    <canvas id="particles"></canvas>
+
+    <!-- Global Navigation -->
+    <nav class="glass-nav scrolled">
+        <a href="index.html" class="logo" style="text-decoration:none;">
+            <img src="assets/images/logo.png" alt="DesiDirect" style="height: 120px; width: auto; mix-blend-mode: multiply; object-fit: contain; transform: scale(1.2);">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="marketplace.html">Discover</a>
+            <a href="artisans.html">Artisans</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">Our Story</a>
+        </div>
+        <div class="nav-actions">
+            <i class='bx bx-search'></i>
+            <a href="cart.html" style="color:inherit; text-decoration:none; position:relative; margin-right:1rem;">
+                <i class='bx bx-shopping-bag'></i>
+                <span style="position:absolute; top:-5px; right:-10px; background:var(--secondary-color); color:white; font-size:0.6rem; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-weight: bold;">2</span>
+            </a>
+            <a href="login.html" class="cta-button primary" style="text-decoration:none; padding: 0.5rem 1.25rem; background-color: red; border-color: red;">Sign In</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Parallax) -->
+    <header class="hero" id="discover">
+        <div class="parallax-bg"></div>
+        <div class="hero-content">
+            <div class="badge">Direct from the heart of the village</div>
+            <h1 class="hero-title">Discover the Soul of <span class="highlight">Authentic Craft</span></h1>
+            <p class="hero-subtitle">Connecting you directly with master artisans. Experience the warmth of tradition
+                paired with the convenience of modern commerce.</p>
+            <div class="hero-buttons">
+                <button class="cta-button primary glow" onclick="window.location.href='marketplace.html'">Explore Collection</button>
+                <button class="cta-button secondary" onclick="window.location.href='artisans.html'">Meet the Artisans</button>
+            </div>
+
+            <!-- Floating Stats Card -->
+            <div class="floating-card stat-card glass-panel" data-speed="2">
+                <div class="stat-icon"><i class='bx bx-world'></i></div>
+                <div class="stat-info">
+                    <h4>500+</h4>
+                    <p>Villages Connected</p>
+                </div>
+            </div>
+
+            <!-- Floating Artisan Card -->
+            <div class="floating-card artisan-hero-card glass-panel" data-speed="-1.5">
+                <img src="assets/images/artisan.png" alt="Artisan">
+                <div class="artisan-info">
+                    <h4>Priya S.</h4>
+                    <p>Master Weaver</p>
+                </div>
+            </div>
+        </div>
+
+        <a href="#products" class="scroll-indicator" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <span class="mouse">
+                <span class="wheel"></span>
+            </span>
+            <p>Scroll down</p>
+        </a>
+    </header>
+
+    <!-- Products Showcase Section -->
+    <section class="products-section" id="products">
+        <div class="section-header">
+            <h2 class="section-title">Curated <span class="highlight">Treasures</span></h2>
+            <p>Handpicked organic goods and masterful crafts that tell a story.</p>
+        </div>
+
+        <div class="product-grid">
+            <!-- Product Card 1 -->
+            <div class="product-card glass-panel" onclick="window.location.href='product-details.html'">
+                <div class="product-image-container">
+                    <img src="assets/images/pottery.png" alt="Handmade Terracotta Pottery" class="product-img">
+                    <div class="product-tag">Bestseller</div>
+                    <button class="wishlist-btn"><i class='bx bx-heart'></i></button>
+                </div>
+                <div class="product-details">
+                    <div class="product-meta">
+                        <span class="category">Ceramics</span>
+                        <div class="rating"><i class='bx bxs-star'></i> 4.9</div>
+                    </div>
+                    <h3 class="product-name">Handcrafted Terracotta Vase</h3>
+                    <p class="artisan-credit">By Ramesh Kumar • Rajasthan</p>
+                    <div class="product-footer">
+                        <span class="price">450.00</span>
+                        <button class="add-to-cart-btn"><i class='bx bx-plus'></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Card 2 -->
+            <div class="product-card glass-panel" onclick="window.location.href='product-details.html'">
+                <div class="product-image-container">
+                    <img src="assets/images/basket.png" alt="Woven Basket" class="product-img">
+                    <button class="wishlist-btn"><i class='bx bx-heart'></i></button>
+                </div>
+                <div class="product-details">
+                    <div class="product-meta">
+                        <span class="category">Home Decor</span>
+                        <div class="rating"><i class='bx bxs-star'></i> 4.8</div>
+                    </div>
+                    <h3 class="product-name">Natural Fiber Storage Basket</h3>
+                    <p class="artisan-credit">By Lakshmi Handlooms • Assam</p>
+                    <div class="product-footer">
+                        <span class="price">320.00</span>
+                        <button class="add-to-cart-btn"><i class='bx bx-plus'></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Card 3 -->
+            <div class="product-card glass-panel" onclick="window.location.href='product-details.html'">
+                <div class="product-image-container">
+                    <img src="assets/images/fabric.png" alt="Traditional Organic Fabric" class="product-img">
+                    <div class="product-tag new">New</div>
+                    <button class="wishlist-btn"><i class='bx bx-heart'></i></button>
+                </div>
+                <div class="product-details">
+                    <div class="product-meta">
+                        <span class="category">Textiles</span>
+                        <div class="rating"><i class='bx bxs-star'></i> 5.0</div>
+                    </div>
+                    <h3 class="product-name">Organic Handwoven Scarf</h3>
+                    <p class="artisan-credit">By Weaver's Coop • Gujarat</p>
+                    <div class="product-footer">
+                        <span class="price">280.00</span>
+                        <button class="add-to-cart-btn"><i class='bx bx-plus'></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Card 4 -->
+            <div class="product-card glass-panel" onclick="window.location.href='product-details.html'">
+                <div class="product-image-container">
+                    <img src="assets/images/organic_food.png" alt="Organic Grains" class="product-img">
+                    <button class="wishlist-btn"><i class='bx bx-heart'></i></button>
+                </div>
+                <div class="product-details">
+                    <div class="product-meta">
+                        <span class="category">Pantry</span>
+                        <div class="rating"><i class='bx bxs-star'></i> 4.7</div>
+                    </div>
+                    <h3 class="product-name">Premium Heritage Millet</h3>
+                    <p class="artisan-credit">By Green Earth Farm • Punjab</p>
+                    <div class="product-footer">
+                        <span class="price">150.00</span>
+                        <button class="add-to-cart-btn"><i class='bx bx-plus'></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="view-all-container">
+            <button class="cta-button outline" onclick="window.location.href='products.html'">View All Products <i class='bx bx-right-arrow-alt'></i></button>
+        </div>
+    </section>
+
+    <!-- Storytelling Layout Section -->
+    <section class="story-section" id="artisans">
+        <div class="story-container glass-panel large">
+            <div class="story-content">
+                <div class="badge">Impact Driven</div>
+                <h2 class="section-title">Empowering <span class="highlight">Creatives</span></h2>
+                <p>Before DesiDirect, village artisans struggled to reach global markets. Now, 100% of the profits go
+                    directly to the creators, preserving ancient crafts and sustaining rural communities.</p>
+                <div class="story-metrics">
+                    <div class="metric">
+                        <h3 class="counter" data-target="100">0</h3><span>%</span>
+                        <p>Direct Profit</p>
+                    </div>
+                    <div class="metric">
+                        <h3 class="counter" data-target="2">0</h3><span>M+</span>
+                        <p>Lives Impacted</p>
+                    </div>
+                </div>
+                <button class="cta-button primary" onclick="window.location.href='artisans.html'">Read Their Stories</button>
+            </div>
+            <div class="story-visual">
+                <div class="visual-stack">
+                    <img src="assets/images/artisan.png" alt="Artisan working" class="main-visual">
+                    <div class="overlay-card glass-panel floating" style="animation-delay: 1s;">
+                        <i class='bx bxs-quote-left'></i>
+                        <p>"My craft now reaches homes worldwide."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Global Footer -->
+    <footer class="glass-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <img src="assets/images/logo.png" alt="DesiDirect" style="height: 120px; width: auto; mix-blend-mode: multiply; object-fit: contain; transform: scale(1.2);">
+                </div>
+                <p>Bringing the soul of rural craftsmanship to the modern world.</p>
+                <div class="social-links">
+                    <a href="#"><i class='bx bxl-instagram'></i></a>
+                    <a href="#"><i class='bx bxl-twitter'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Shop</h4>
+                <a href="products.html">Ceramics</a>
+                <a href="products.html">Textiles</a>
+                <a href="products.html">Home Decor</a>
+                <a href="products.html">Organic Pantry</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="about.html">About Us</a>
+                <a href="artisans.html">Our Artisans</a>
+                <a href="about.html">Sustainability</a>
+                <a href="#">Careers</a>
+            </div>
+            <div class="footer-subscribe">
+                <h4>Stay Connected</h4>
+                <p>Get updates on new collections and artisan stories.</p>
+                <div class="subscribe-form">
+                    <input type="email" placeholder="Your email address">
+                    <button><i class='bx bx-send'></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+            <p style="margin:0;">&copy; 2026 DesiDirect Marketplace. All rights reserved.</p>
+            <a href="login.html" onclick="sessionStorage.setItem('openAdminTab','1')" style="color:rgba(255,255,255,0.35);font-size:0.75rem;text-decoration:none;display:flex;align-items:center;gap:0.3rem;transition:color 0.2s;"
+               onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
+                <i class='bx bx-shield-quarter'></i> Admin Portal
+            </a>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script type="module" src="js/auth-sync.js"></script>
+    <script src="js/animations.js"></script>
+</body>
+
+</html>

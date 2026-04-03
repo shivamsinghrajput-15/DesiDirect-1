@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesiDirect - Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* ---- Auth Tab Switcher ---- */
+        .auth-tabs {
+            display: flex;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .auth-tab-btn {
+            flex: 1;
+            padding: 0.65rem 1rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.55);
+            transition: all 0.25s;
+        }
+        .auth-tab-btn.active {
+            background: var(--secondary-color, #e2725b);
+            color: #fff;
+        }
+        .auth-tab-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.85);
+        }
+
+        /* ---- Phone fields ---- */
+        .phone-input-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+        .phone-input-row input {
+            flex: 1;
+        }
+        .phone-input-row button {
+            white-space: nowrap;
+            padding: 0 1.1rem;
+            font-size: 0.85rem;
+        }
+        #otpStep {
+            display: none;
+            gap: 0.5rem;
+            align-items: stretch;
+            margin-top: 0.5rem;
+        }
+        #otpStep input { flex: 1; }
+        #otpStep button { white-space: nowrap; padding: 0 1.1rem; font-size: 0.85rem; }
+
+        /* ---- Google button icon ---- */
+        #googleSignupBtn i { font-size: 1.1rem; vertical-align: middle; margin-right: 0.4rem; }
+    </style>
+</head>
+<body>
+    <!-- Global Navigation -->
+    <nav class="glass-nav scrolled">
+        <a href="index.html" class="logo" style="text-decoration:none;">
+            <img src="assets/images/logo.png" alt="DesiDirect" style="height: 120px; width: auto; mix-blend-mode: multiply; object-fit: contain; transform: scale(1.2);">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="marketplace.html">Discover</a>
+            <a href="artisans.html">Artisans</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">Our Story</a>
+        </div>
+        <div class="nav-actions">
+            <i class='bx bx-search'></i>
+            <a href="cart.html" style="color:inherit; text-decoration:none; position:relative; margin-right:1rem;">
+                <i class='bx bx-shopping-bag'></i>
+                <span style="position:absolute; top:-5px; right:-10px; background:var(--secondary-color); color:white; font-size:0.6rem; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-weight: bold;">2</span>
+            </a>
+            <a href="login.html" class="cta-button primary" style="text-decoration:none; padding: 0.5rem 1.25rem; background-color: red; border-color: red;">Sign In</a>
+        </div>
+    </nav>
+
+    <div class="auth-page">
+        <video autoplay muted loop playsinline class="auth-video-bg">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-group-of-friends-partying-happily-46520-large.mp4" type="video/mp4">
+        </video>
+        <canvas id="particles" style="z-index: 1;"></canvas>
+
+        <div class="auth-container">
+            <div class="auth-header">
+                <a href="index.html" class="logo" style="justify-content: center; margin-bottom: 1rem;">
+                    <img src="assets/images/logo.png" alt="DesiDirect" style="height: 120px; width: auto; mix-blend-mode: multiply; object-fit: contain; transform: scale(1.2);">
+                </a>
+                <h2>Create Account</h2>
+                <p>Join the movement empowering rural artisans.</p>
+            </div>
+
+            <!-- Error / Success message -->
+            <div id="authError" style="display:none; border-radius:10px; padding:0.75rem 1rem; margin-bottom:1rem; font-size:0.88rem; background:#fff0ee; color:#c0392b; border:1px solid #e2725b;"></div>
+
+            <!-- invisible reCAPTCHA anchor (Phone auth) -->
+            <div id="recaptcha-container"></div>
+
+            <!-- Tab Switcher -->
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" data-tab="emailPanel" id="tabEmail">
+                    <i class='bx bx-envelope'></i> Email
+                </button>
+                <button class="auth-tab-btn" data-tab="phonePanel" id="tabPhone">
+                    <i class='bx bx-mobile-alt'></i> Phone
+                </button>
+            </div>
+
+            <!-- ===== EMAIL PANEL ===== -->
+            <div id="emailPanel" class="auth-tab-panel">
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" placeholder="John Doe" required autocomplete="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="john@example.com" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Account Type</label>
+                        <select id="role" required>
+                            <option value="customer">I am a Customer</option>
+                            <option value="producer">I am a Producer / Artisan</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="••••••••" required autocomplete="new-password" minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm">Confirm Password</label>
+                        <input type="password" id="confirm" placeholder="••••••••" required autocomplete="new-password">
+                    </div>
+
+                    <div class="auth-buttons">
+                        <button type="submit" id="signupBtn" class="cta-button primary glow">Create Account</button>
+
+                        <div class="auth-divider">OR</div>
+
+                        <button type="button" id="googleSignupBtn" class="cta-button outline">
+                            <i class='bx bxl-google'></i> Sign up with Google
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ===== PHONE PANEL ===== -->
+            <div id="phonePanel" class="auth-tab-panel" style="display:none;">
+                <div class="form-group">
+                    <label for="phoneName">Full Name</label>
+                    <input type="text" id="phoneName" placeholder="John Doe" autocomplete="name">
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneRole">Account Type</label>
+                    <select id="phoneRole">
+                        <option value="customer">I am a Customer</option>
+                        <option value="producer">I am a Producer / Artisan</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneInput">Phone Number</label>
+                    <div class="phone-input-row">
+                        <input type="tel" id="phoneInput" placeholder="+91 98765 43210" autocomplete="tel">
+                        <button type="button" id="sendOTPBtn" class="cta-button primary">Send OTP</button>
+                    </div>
+                </div>
+
+                <div id="otpStep" class="form-group">
+                    <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+                    <button type="button" id="verifyOTPBtn" class="cta-button primary glow">Verify &amp; Join</button>
+                </div>
+
+                <p style="font-size:0.78rem; color:rgba(255,255,255,0.45); margin-top:0.75rem; line-height:1.5;">
+                    <i class='bx bx-lock-alt'></i> We'll send a one-time password to your mobile number. Standard SMS rates may apply.
+                </p>
+            </div>
+
+            <!-- Footer link -->
+            <div class="auth-footer" style="margin-top:1.25rem;">
+                Already have an account? <a href="login.html">Login here</a>
+            </div>
+
+            <!-- Admin shortcut -->
+            <div style="text-align:center; margin-top:0.85rem;">
+                <a href="login.html#admin" onclick="sessionStorage.setItem('openAdminTab','1')"
+                   style="color:rgba(255,255,255,0.35);font-size:0.78rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem;transition:color 0.2s;"
+                   onmouseover="this.style.color='rgba(255,255,255,0.65)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
+                    <i class='bx bx-shield-quarter'></i> Are you an Admin? Sign in here
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase signup handler (ES module) -->
+    <script type="module" src="js/register.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- Global Footer -->
+    <footer class="glass-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <img src="assets/images/logo.png" alt="DesiDirect" style="height: 120px; width: auto; mix-blend-mode: multiply; object-fit: contain; transform: scale(1.2);">
+                </div>
+                <p>Bringing the soul of rural craftsmanship to the modern world.</p>
+                <div class="social-links">
+                    <a href="#"><i class='bx bxl-instagram'></i></a>
+                    <a href="#"><i class='bx bxl-twitter'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Shop</h4>
+                <a href="products.html">Ceramics</a>
+                <a href="products.html">Textiles</a>
+                <a href="products.html">Home Decor</a>
+                <a href="products.html">Organic Pantry</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="about.html">About Us</a>
+                <a href="artisans.html">Our Artisans</a>
+                <a href="about.html">Sustainability</a>
+                <a href="#">Careers</a>
+            </div>
+            <div class="footer-subscribe">
+                <h4>Stay Connected</h4>
+                <p>Get updates on new collections and artisan stories.</p>
+                <div class="subscribe-form">
+                    <input type="email" placeholder="Your email address">
+                    <button><i class='bx bx-send'></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 DesiDirect Marketplace. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

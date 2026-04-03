@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesiDirect - Secure Payment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        .payment-page {
+            min-height: 100vh;
+            background: var(--background-light);
+            padding: 7rem 5% 4rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* ── Order Summary Card ── */
+        .order-summary-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            width: 340px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+            height: fit-content;
+        }
+
+        .order-summary-card h3 {
+            color: var(--primary-color);
+            font-size: 1.15rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .order-item-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .order-item-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .order-item-qty {
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .order-item-name {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .order-item-price {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .order-divider {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 1rem 0;
+        }
+
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .order-total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        .empty-cart-notice {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #aaa;
+        }
+
+        /* ── Payment Form Card ── */
+        .payment-form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            width: 420px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+        }
+
+        .payment-form-card h2 {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .payment-form-card p.subtitle {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .pay-methods {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .pay-method-btn {
+            padding: 0.75rem 0.3rem;
+            border-radius: 12px;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid #ddd;
+            background: white;
+            color: #555;
+            transition: all 0.2s;
+        }
+
+        .pay-method-btn.active {
+            border-color: var(--secondary-color);
+            background: rgba(226,114,91,0.08);
+            color: var(--primary-color);
+        }
+
+        .pay-method-btn.cod-btn.active {
+            border-color: #27ae60;
+            background: rgba(39,174,96,0.08);
+            color: #1e8449;
+        }
+
+        .pay-method-btn i {
+            display: block;
+            font-size: 1.3rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .qr-box {
+            border: 2px dashed #ddd;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            background: #fafafa;
+            margin-bottom: 0.75rem;
+        }
+
+        .qr-box .qr-icon {
+            font-size: 5rem;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+
+        .qr-box p { font-size: 0.85rem; color: #777; margin: 0.5rem 0 0; }
+
+        .cod-panel-inner {
+            background: linear-gradient(135deg, #f0fff4, #e8f8ef);
+            border: 1.5px solid #a8e6c1;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .cod-panel-inner .cod-icon {
+            font-size: 3.5rem;
+            color: #27ae60;
+            margin-bottom: 0.5rem;
+        }
+
+        .cod-panel-inner h4 { color: #1e8449; font-size: 1rem; margin-bottom: 0.4rem; }
+        .cod-panel-inner p  { color: #555; font-size: 0.84rem; line-height: 1.5; margin: 0; }
+
+        .pay-panel { display: none; }
+        .pay-panel.active { display: block; }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            color: #aaa;
+            font-size: 0.78rem;
+            margin-top: 1.25rem;
+        }
+
+        #payBtn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .success-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-overlay.show { display: flex; }
+
+        .success-box {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            animation: successPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes successPop {
+            from { transform: scale(0.7); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+
+        .success-icon {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+        }
+
+        .success-box h3 { color: var(--primary-color); font-size: 1.6rem; margin-bottom: 0.5rem; }
+        .success-box p  { color: #666; font-size: 0.92rem; margin-bottom: 1.75rem; }
+    </style>
+</head>
+<body>
+    <!-- Global Navigation -->
+    <nav class="glass-nav scrolled">
+        <a href="index.html" class="logo" style="text-decoration:none;">
+            <img src="assets/images/logo.png" alt="DesiDirect" style="height:120px;width:auto;mix-blend-mode:multiply;object-fit:contain;transform:scale(1.2);">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="marketplace.html">Discover</a>
+            <a href="artisans.html">Artisans</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">Our Story</a>
+        </div>
+        <div class="nav-actions">
+            <i class='bx bx-search'></i>
+            <a href="cart.html" style="color:inherit;text-decoration:none;position:relative;margin-right:1rem;">
+                <i class='bx bx-shopping-bag'></i>
+                <span id="navCartCount" style="position:absolute;top:-5px;right:-10px;background:var(--secondary-color);color:white;font-size:0.6rem;border-radius:50%;width:18px;height:18px;display:none;align-items:center;justify-content:center;font-weight:bold;"></span>
+            </a>
+            <a href="login.html" class="cta-button primary" id="navAuthBtn" style="text-decoration:none;padding:0.5rem 1.25rem;">Sign In</a>
+        </div>
+    </nav>
+
+    <!-- ── Main Payment Layout ── -->
+    <div class="payment-page">
+
+        <!-- Order Summary (pulled from real cart) -->
+        <div class="order-summary-card reveal">
+            <h3><i class='bx bx-receipt' style="color:var(--secondary-color);"></i> Order Summary</h3>
+            <div id="orderItemsList">
+                <!-- populated by JS -->
+            </div>
+            <hr class="order-divider">
+            <div class="order-row">
+                <span>Subtotal</span>
+                <span id="orderSubtotal">₹0.00</span>
+            </div>
+            <div class="order-row">
+                <span>Shipping Fee</span>
+                <span id="orderShipping">₹80.00</span>
+            </div>
+            <div class="order-total-row">
+                <span>Total (INR)</span>
+                <span id="orderTotal">₹0.00</span>
+            </div>
+        </div>
+
+        <!-- Payment Form -->
+        <div class="payment-form-card reveal">
+            <h2>Secure Payment</h2>
+            <p class="subtitle" id="paySubtitle">Complete your purchase</p>
+
+            <!-- Empty cart warning -->
+            <div id="emptyCartWarning" style="display:none;text-align:center;padding:2rem;background:#fff8f5;border-radius:14px;margin-bottom:1.5rem;">
+                <i class='bx bx-cart-alt' style="font-size:2.5rem;color:#ddd;display:block;margin-bottom:0.75rem;"></i>
+                <p style="color:#aaa;margin:0 0 1rem;">Your cart is empty.</p>
+                <a href="marketplace.html" class="cta-button primary" style="text-decoration:none;display:inline-flex;">Shop Now</a>
+            </div>
+
+            <div id="paymentFormContent">
+                <!-- Payment Method Selector -->
+                <div class="pay-methods">
+                    <button class="pay-method-btn active" onclick="switchMethod('upi', this)">
+                        <i class='bx bx-qr-scan'></i> UPI / QR
+                    </button>
+                    <button class="pay-method-btn" onclick="switchMethod('card', this)">
+                        <i class='bx bx-credit-card'></i> Card
+                    </button>
+                    <button class="pay-method-btn" onclick="switchMethod('netbanking', this)">
+                        <i class='bx bx-building-house'></i> Net Banking
+                    </button>
+                    <button class="pay-method-btn cod-btn" onclick="switchMethod('cod', this)">
+                        <i class='bx bx-package'></i> Cash on Delivery
+                    </button>
+                </div>
+
+                <!-- UPI / QR Panel -->
+                <div class="pay-panel active" id="upiPanel">
+                    <div class="qr-box">
+                        <div class="qr-icon"><i class='bx bx-qr'></i></div>
+                        <p>Click <strong>Pay</strong> below — Razorpay will show a live QR code.</p>
+                        <p style="margin-top:0.35rem;">Scan it with any UPI app: GPay, PhonePe, Paytm, BHIM…</p>
+                    </div>
+                    <div style="background:#fff8f0;border:1px dashed #f4a261;border-radius:10px;padding:0.75rem;font-size:0.78rem;color:#c07a3a;text-align:center;">
+                        <i class='bx bx-info-circle'></i> <strong>Test Mode:</strong> Use UPI ID <code>success@razorpay</code> in the Razorpay modal to simulate a successful payment.
+                    </div>
+                </div>
+
+                <!-- Card Panel -->
+                <div class="pay-panel" id="cardPanel">
+                    <div class="form-group">
+                        <label>Card Number</label>
+                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number">
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                        <div class="form-group">
+                            <label>MM / YY</label>
+                            <input type="text" placeholder="08 / 27" maxlength="7" autocomplete="cc-exp">
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="password" placeholder="•••" maxlength="4" autocomplete="cc-csc">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cardholder Name</label>
+                        <input type="text" placeholder="As on card" autocomplete="cc-name">
+                    </div>
+                </div>
+
+                <!-- Net Banking Panel -->
+                <div class="pay-panel" id="netbankingPanel">
+                    <div class="form-group">
+                        <label>Select Bank</label>
+                        <select>
+                            <option value="">-- Choose your bank --</option>
+                            <option>State Bank of India</option>
+                            <option>HDFC Bank</option>
+                            <option>ICICI Bank</option>
+                            <option>Axis Bank</option>
+                            <option>Kotak Mahindra Bank</option>
+                            <option>Punjab National Bank</option>
+                            <option>Bank of Baroda</option>
+                            <option>Canara Bank</option>
+                        </select>
+                    </div>
+                    <div style="background:#f9f9f9;border-radius:10px;padding:0.9rem;font-size:0.82rem;color:#777;text-align:center;margin-bottom:0.75rem;">
+                        <i class='bx bx-transfer'></i> You will be redirected to your bank's secure portal.
+                    </div>
+                </div>
+
+                <!-- COD Panel -->
+                <div class="pay-panel" id="codPanel">
+                    <div class="cod-panel-inner">
+                        <div class="cod-icon"><i class='bx bx-money'></i></div>
+                        <h4>Cash on Delivery</h4>
+                        <p>Pay in cash when your order arrives at your doorstep. No advance payment needed.</p>
+                        <p style="margin-top:0.75rem;font-size:0.8rem;color:#888;">📦 Orders are typically delivered in 5–7 business days.</p>
+                    </div>
+                </div>
+
+                <button id="payBtn" class="cta-button primary glow ripple-btn" onclick="handlePay(event)">
+                    <i class='bx bx-lock-alt'></i> Pay <span id="payBtnAmount">₹0.00</span>
+                </button>
+
+                <div class="secure-badge">
+                    <i class='bx bx-shield-quarter'></i> 256-bit SSL encrypted · Your data is safe
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Success Overlay ── -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-box">
+            <div class="success-icon"><i class='bx bx-check'></i></div>
+            <h3>Payment Successful!</h3>
+            <p>Your order has been placed. The artisan will start crafting it with love. 🎨</p>
+            <a href="marketplace.html" class="cta-button primary ripple-btn" style="text-decoration:none;display:inline-flex;width:100%;justify-content:center;" onclick="clearCart()">
+                <i class='bx bx-store'></i> Continue Shopping
+            </a>
+        </div>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="glass-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <img src="assets/images/logo.png" alt="DesiDirect" style="height:120px;width:auto;mix-blend-mode:multiply;object-fit:contain;transform:scale(1.2);">
+                </div>
+                <p>Bringing the soul of rural craftsmanship to the modern world.</p>
+                <div class="social-links">
+                    <a href="#"><i class='bx bxl-instagram'></i></a>
+                    <a href="#"><i class='bx bxl-twitter'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Shop</h4>
+                <a href="products.html">Ceramics</a>
+                <a href="products.html">Textiles</a>
+                <a href="products.html">Home Decor</a>
+                <a href="products.html">Organic Pantry</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="about.html">About Us</a>
+                <a href="artisans.html">Our Artisans</a>
+                <a href="about.html">Sustainability</a>
+                <a href="#">Careers</a>
+            </div>
+            <div class="footer-subscribe">
+                <h4>Stay Connected</h4>
+                <p>Get updates on new collections and artisan stories.</p>
+                <div class="subscribe-form">
+                    <input type="email" placeholder="Your email address">
+                    <button><i class='bx bx-send'></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 DesiDirect Marketplace. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script src="js/animations.js"></script>
+    <script type="module" src="js/auth-sync.js"></script>
+    <!-- Razorpay Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+        const CART_KEY     = 'desi_cart';
+        const SHIPPING_FEE = 80;
+
+        // ── Load real cart from localStorage ──
+        function getCart() {
+            try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); }
+            catch { return []; }
+        }
+
+        function getSubtotal(cart) {
+            return cart.reduce((s, i) => s + i.price * i.qty, 0);
+        }
+
+        // ── Render Order Summary ──
+        function renderOrderSummary() {
+            const cart     = getCart();
+            const list     = document.getElementById('orderItemsList');
+            const subtotal = getSubtotal(cart);
+            const total    = subtotal + SHIPPING_FEE;
+
+            // Update nav cart badge
+            const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+            const badge    = document.getElementById('navCartCount');
+            if (badge && totalQty > 0) {
+                badge.textContent   = totalQty;
+                badge.style.display = 'flex';
+            }
+
+            if (cart.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-cart-notice">
+                        <i class='bx bx-cart-alt' style="font-size:2rem;display:block;margin-bottom:0.5rem;opacity:0.35;"></i>
+                        No items in cart
+                    </div>`;
+                document.getElementById('orderSubtotal').textContent = '₹0.00';
+                document.getElementById('orderShipping').textContent  = '₹0.00';
+                document.getElementById('orderTotal').textContent     = '₹0.00';
+                document.getElementById('paySubtitle').textContent    = 'Your cart is empty';
+                document.getElementById('payBtnAmount').textContent   = '₹0.00';
+                document.getElementById('payBtn').disabled            = true;
+                document.getElementById('emptyCartWarning').style.display  = 'block';
+                document.getElementById('paymentFormContent').style.display = 'none';
+                return;
+            }
+
+            // Render real items
+            list.innerHTML = cart.map(item => `
+                <div class="order-item-row">
+                    <div class="order-item-qty">${item.qty}</div>
+                    <span class="order-item-name">${item.productName || item.name || 'Item'}</span>
+                    <span class="order-item-price">₹${(item.price * item.qty).toLocaleString('en-IN')}.00</span>
+                </div>
+            `).join('');
+
+            const fmtSubtotal = `₹${subtotal.toLocaleString('en-IN')}.00`;
+            const fmtTotal    = `₹${total.toLocaleString('en-IN')}.00`;
+
+            document.getElementById('orderSubtotal').textContent  = fmtSubtotal;
+            document.getElementById('orderShipping').textContent  = `₹${SHIPPING_FEE}.00`;
+            document.getElementById('orderTotal').textContent     = fmtTotal;
+            document.getElementById('paySubtitle').textContent    = `Complete your purchase of ${fmtTotal}`;
+            document.getElementById('payBtnAmount').textContent   = fmtTotal;
+        }
+
+        // ── Switch Payment Method ──
+        let activeMethod = 'upi';
+        function switchMethod(method, btn) {
+            activeMethod = method;
+            document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.pay-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(method + 'Panel').classList.add('active');
+
+            // Update pay button label for COD
+            const payBtn = document.getElementById('payBtn');
+            const amtEl  = document.getElementById('payBtnAmount');
+            if (method === 'cod') {
+                payBtn.style.background = 'linear-gradient(135deg,#27ae60,#1e8449)';
+                payBtn.style.borderColor = '#27ae60';
+                payBtn.innerHTML = '<i class="bx bx-check-circle"></i> Confirm COD Order &nbsp;<span id="payBtnAmount">' + (amtEl ? amtEl.textContent : '') + '</span>';
+            } else {
+                payBtn.style.background = '';
+                payBtn.style.borderColor = '';
+                payBtn.innerHTML = '<i class="bx bx-lock-alt"></i> Pay <span id="payBtnAmount">' + (amtEl ? amtEl.textContent : '₹0.00') + '</span>';
+            }
+        }
+
+        // ── Format card number with spaces ──
+        document.addEventListener('DOMContentLoaded', () => {
+            const cardInput = document.getElementById('cardNumber');
+            if (cardInput) {
+                cardInput.addEventListener('input', function () {
+                    this.value = this.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim().slice(0, 19);
+                });
+            }
+        });
+
+        // ── Razorpay Key (Test Mode) ──
+        // ⚠️ Replace with your actual Key ID from razorpay.com → Settings → API Keys
+        const RAZORPAY_KEY = 'rzp_test_SZ477BVxtFhONa';  // Test Key ID
+
+        // ── Handle Pay (branches on selected method) ──
+        function handlePay(e) {
+            e.preventDefault();
+            if (activeMethod === 'cod') { handleCOD(); return; }
+            handleRazorpay();
+        }
+
+        // ── Cash on Delivery ──
+        function handleCOD() {
+            const cart = getCart();
+            if (cart.length === 0) return;
+
+            const subtotal = getSubtotal(cart);
+            const totalINR = subtotal + SHIPPING_FEE;
+            let user = {};
+            try { user = JSON.parse(localStorage.getItem('desi_user') || '{}'); } catch(e) {}
+
+            const orderId = 'ORD-' + Date.now();
+
+            // Save order
+            const orders = JSON.parse(localStorage.getItem('desi_orders') || '[]');
+            orders.push({
+                id:            orderId,
+                customerId:    user.id || '',
+                customerName:  user.name || 'Guest',
+                items:         cart,
+                total:         totalINR,
+                status:        'processing',
+                paymentStatus: 'cod_pending',
+                paymentMethod: 'cod',
+                date:          Date.now()
+            });
+            localStorage.setItem('desi_orders', JSON.stringify(orders));
+
+            // Save payment record
+            const payments = JSON.parse(localStorage.getItem('desi_payments') || '[]');
+            payments.push({
+                id:           'COD-' + Date.now(),
+                orderId:      orderId,
+                customerId:   user.id || '',
+                customerName: user.name || 'Guest',
+                amount:       totalINR,
+                method:       'cod',
+                status:       'pending',
+                date:         Date.now()
+            });
+            localStorage.setItem('desi_payments', JSON.stringify(payments));
+
+            // Clear cart & show success
+            localStorage.removeItem('desi_cart');
+
+            // Customise the success overlay for COD
+            document.querySelector('.success-box h3').textContent = 'Order Confirmed!';
+            document.querySelector('.success-box p').textContent  =
+                'Your COD order has been placed. Pay in cash when it arrives. 🛵';
+            document.getElementById('successOverlay').classList.add('show');
+        }
+
+        // ── Razorpay (UPI QR / Card / Netbanking / Wallet) ──
+        function handleRazorpay() {
+            const cart = getCart();
+            if (cart.length === 0) return;
+
+            const subtotal   = getSubtotal(cart);
+            const totalINR   = subtotal + SHIPPING_FEE;
+            const totalPaise = totalINR * 100;   // Razorpay uses paise
+
+            let user = {};
+            try { user = JSON.parse(localStorage.getItem('desi_user') || '{}'); } catch(e) {}
+
+            // Build Razorpay options
+            // NOTE: No custom config.display needed — Razorpay's standard modal
+            // already shows UPI (with QR scan), Card, Netbanking, and Wallet tabs.
+            const options = {
+                key:         RAZORPAY_KEY,
+                amount:      totalPaise,
+                currency:    'INR',
+                name:        'DesiDirect',
+                description: `Order of ${cart.length} item(s)`,
+                image:       'assets/images/logo.png',
+
+                prefill: {
+                    name:    user.name  || '',
+                    email:   user.email || '',
+                    contact: user.phone || ''
+                },
+
+                theme: { color: '#2F4F4F' },
+
+                handler: function(response) {
+                    const orderId = 'ORD-' + Date.now();
+                    const payId   = response.razorpay_payment_id;
+
+                    const orders = JSON.parse(localStorage.getItem('desi_orders') || '[]');
+                    orders.push({
+                        id:            orderId,
+                        customerId:    user.id || '',
+                        customerName:  user.name || 'Guest',
+                        items:         cart,
+                        total:         totalINR,
+                        status:        'processing',
+                        paymentStatus: 'paid',
+                        paymentMethod: activeMethod,
+                        razorpayId:    payId,
+                        date:          Date.now()
+                    });
+                    localStorage.setItem('desi_orders', JSON.stringify(orders));
+
+                    const payments = JSON.parse(localStorage.getItem('desi_payments') || '[]');
+                    payments.push({
+                        id:           payId,
+                        orderId:      orderId,
+                        customerId:   user.id || '',
+                        customerName: user.name || 'Guest',
+                        amount:       totalINR,
+                        method:       activeMethod,
+                        status:       'success',
+                        date:         Date.now()
+                    });
+                    localStorage.setItem('desi_payments', JSON.stringify(payments));
+
+                    localStorage.removeItem('desi_cart');
+                    document.getElementById('successOverlay').classList.add('show');
+                },
+
+                modal: {
+                    ondismiss: function() {
+                        const btn = document.getElementById('payBtn');
+                        btn.disabled  = false;
+                        btn.innerHTML = '<i class="bx bx-lock-alt"></i> Pay <span id="payBtnAmount">' +
+                            '₹' + totalINR.toLocaleString('en-IN') + '.00</span>';
+                    }
+                }
+            };
+
+            const btn = document.getElementById('payBtn');
+            btn.disabled  = true;
+            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Opening Razorpay…';
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function(resp) {
+                alert('Payment failed: ' + resp.error.description);
+                btn.disabled  = false;
+                btn.innerHTML = '<i class="bx bx-lock-alt"></i> Pay ₹' + totalINR.toLocaleString('en-IN') + '.00';
+            });
+            rzp.open();
+        }
+
+        // ── Clear cart after success ──
+        function clearCart() {
+            localStorage.removeItem(CART_KEY);
+        }
+
+        // ── Init ──
+        renderOrderSummary();
+    </script>
+</body>
+</html>

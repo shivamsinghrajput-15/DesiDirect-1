@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesiDirect – Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-logo">
+            <img src="assets/images/logo.png" alt="DesiDirect">
+            <span class="admin-tag-badge">Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+            <span class="nav-label">Overview</span>
+            <a class="nav-item active" data-sec="dashboard" href="#">
+                <i class="bx bx-grid-alt"></i><span>Dashboard</span>
+            </a>
+
+            <span class="nav-label">Management</span>
+            <a class="nav-item" data-sec="customers" href="#">
+                <i class="bx bx-group"></i><span>Customers</span>
+                <span class="nav-badge" id="nb-customers">0</span>
+            </a>
+            <a class="nav-item" data-sec="producers" href="#">
+                <i class="bx bx-store"></i><span>Producers</span>
+                <span class="nav-badge" id="nb-producers">0</span>
+            </a>
+            <a class="nav-item" data-sec="products" href="#">
+                <i class="bx bx-package"></i><span>Products</span>
+                <span class="nav-badge" id="nb-products">0</span>
+            </a>
+            <a class="nav-item" data-sec="orders" href="#">
+                <i class="bx bx-receipt"></i><span>Orders</span>
+            </a>
+            <a class="nav-item" data-sec="payments" href="#">
+                <i class="bx bx-credit-card"></i><span>Payments</span>
+            </a>
+
+            <span class="nav-label">Insights</span>
+            <a class="nav-item" data-sec="analytics" href="#">
+                <i class="bx bx-line-chart"></i><span>Analytics</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item" href="index.html" target="_blank">
+                <i class="bx bx-home"></i><span>View Store</span>
+            </a>
+            <a class="nav-item logout-item" href="#" onclick="adminLogout()">
+                <i class="bx bx-log-out"></i><span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ═══ CONTENT ═══ -->
+    <div class="admin-content">
+        <header class="admin-header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="bx bx-menu"></i></button>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <span class="header-time" id="headerTime"></span>
+                <div class="admin-profile">
+                    <div class="admin-avatar"><i class="bx bxs-crown"></i></div>
+                    <div><div class="admin-name">Admin</div><div class="admin-role">Super Admin</div></div>
+                </div>
+            </div>
+        </header>
+
+        <main class="admin-main">
+
+            <!-- ── DASHBOARD ── -->
+            <section class="adm-section active" id="sec-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card" style="--accent:#17a2b8">
+                        <div class="stat-icon" style="background:rgba(23,162,184,.1)"><i class="bx bx-group" style="color:#17a2b8"></i></div>
+                        <div><div class="stat-label">Customers</div><div class="stat-value" id="stat-customers">0</div></div>
+                    </div>
+                    <div class="stat-card" style="--accent:#2F4F4F">
+                        <div class="stat-icon" style="background:rgba(47,79,79,.1)"><i class="bx bx-store" style="color:#2F4F4F"></i></div>
+                        <div><div class="stat-label">Producers</div><div class="stat-value" id="stat-producers">0</div></div>
+                    </div>
+                    <div class="stat-card" style="--accent:#e6912d">
+                        <div class="stat-icon" style="background:rgba(244,164,96,.12)"><i class="bx bx-package" style="color:#e6912d"></i></div>
+                        <div><div class="stat-label">Products</div><div class="stat-value" id="stat-products">0</div></div>
+                    </div>
+                    <div class="stat-card" style="--accent:#7c3aed">
+                        <div class="stat-icon" style="background:rgba(124,58,237,.1)"><i class="bx bx-receipt" style="color:#7c3aed"></i></div>
+                        <div><div class="stat-label">Orders</div><div class="stat-value" id="stat-orders">0</div></div>
+                    </div>
+                    <div class="stat-card" style="--accent:#27ae60">
+                        <div class="stat-icon" style="background:rgba(39,174,96,.1)"><i class="bx bx-rupee" style="color:#27ae60"></i></div>
+                        <div><div class="stat-label">Revenue</div><div class="stat-value" id="stat-revenue">₹0</div></div>
+                    </div>
+                    <div class="stat-card" style="--accent:#E2725B">
+                        <div class="stat-icon" style="background:rgba(226,114,91,.1)"><i class="bx bx-time-five" style="color:#E2725B"></i></div>
+                        <div><div class="stat-label">Pending Payments</div><div class="stat-value" id="stat-pending">0</div></div>
+                    </div>
+                </div>
+                <div class="section-card mt-2">
+                    <div class="card-hdr"><h3>Recent Activity</h3></div>
+                    <div id="recentActivity"></div>
+                </div>
+            </section>
+
+            <!-- ── CUSTOMERS ── -->
+            <section class="adm-section" id="sec-customers">
+                <div class="section-toolbar">
+                    <div class="search-wrap">
+                        <i class="bx bx-search"></i>
+                        <input type="text" id="customerSearch" placeholder="Search customers…" oninput="renderCustomers(this.value)">
+                    </div>
+                    <div class="filter-wrap">
+                        <select id="customerFilter" onchange="renderCustomers(document.getElementById('customerSearch').value)">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="section-card"><div id="customersList"></div></div>
+            </section>
+
+            <!-- ── PRODUCERS ── -->
+            <section class="adm-section" id="sec-producers">
+                <div class="section-toolbar">
+                    <div class="search-wrap">
+                        <i class="bx bx-search"></i>
+                        <input type="text" id="producerSearch" placeholder="Search producers…" oninput="renderProducers(this.value)">
+                    </div>
+                    <div class="filter-wrap">
+                        <select id="producerFilter" onchange="renderProducers(document.getElementById('producerSearch').value)">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="pending">Pending Approval</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="section-card"><div id="producersList"></div></div>
+            </section>
+
+            <!-- ── PRODUCTS ── -->
+            <section class="adm-section" id="sec-products">
+                <div class="section-toolbar">
+                    <div class="search-wrap">
+                        <i class="bx bx-search"></i>
+                        <input type="text" id="productSearch" placeholder="Search products…" oninput="renderProducts(this.value)">
+                    </div>
+                    <div class="filter-wrap">
+                        <select id="productFilter" onchange="renderProducts(document.getElementById('productSearch').value)">
+                            <option value="">All</option>
+                            <option value="approved">Approved</option>
+                            <option value="pending">Pending</option>
+                            <option value="removed">Removed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="section-card"><div id="productsList"></div></div>
+            </section>
+
+            <!-- ── ORDERS ── -->
+            <section class="adm-section" id="sec-orders">
+                <div class="section-toolbar">
+                    <div class="search-wrap">
+                        <i class="bx bx-search"></i>
+                        <input type="text" id="orderSearch" placeholder="Search orders…" oninput="renderOrders(this.value)">
+                    </div>
+                    <div class="filter-wrap">
+                        <select id="orderFilter" onchange="renderOrders(document.getElementById('orderSearch').value)">
+                            <option value="">All Statuses</option>
+                            <option value="processing">Processing</option>
+                            <option value="dispatched">Dispatched</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="refund">Refund Requested</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="section-card"><div id="ordersList"></div></div>
+            </section>
+
+            <!-- ── PAYMENTS ── -->
+            <section class="adm-section" id="sec-payments">
+                <div class="section-toolbar">
+                    <div class="filter-tabs" id="payTabWrap">
+                        <button class="filter-tab active" data-pf="">All</button>
+                        <button class="filter-tab" data-pf="success">Successful</button>
+                        <button class="filter-tab" data-pf="failed">Failed</button>
+                        <button class="filter-tab" data-pf="refund">Refunds</button>
+                    </div>
+                </div>
+                <div class="section-card"><div id="paymentsList"></div></div>
+            </section>
+
+            <!-- ── ANALYTICS ── -->
+            <section class="adm-section" id="sec-analytics">
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3><i class="bx bx-trending-up"></i> Revenue – Last 7 Days</h3>
+                        <canvas id="chartRevenue"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="bx bx-pie-chart-alt"></i> Products by Category</h3>
+                        <canvas id="chartCategory"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="bx bx-bar-chart-alt-2"></i> Daily Orders – Last 7 Days</h3>
+                        <canvas id="chartOrders"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="bx bx-trophy"></i> Top Producers by Revenue</h3>
+                        <canvas id="chartProducers"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div><!-- /admin-content -->
+</div><!-- /admin-layout -->
+
+<!-- ═══ MODAL ═══ -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-card">
+        <div class="modal-icon warn" id="modalIcon"><i class="bx bx-error-circle"></i></div>
+        <h3 id="modalTitle">Confirm Action</h3>
+        <p id="modalMsg">Are you sure you want to do this?</p>
+        <div class="modal-actions">
+            <button class="btn-modal btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-modal btn-confirm" id="modalConfirmBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ TOASTS ═══ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

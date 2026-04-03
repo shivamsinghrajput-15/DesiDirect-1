@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesiDirect - Producer Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* ===== Dashboard-scoped layout reset ===== */
+        body { margin:0; padding:0; background:#f4f6f9; }
+
+        /* Override global nav so it doesn't interfere */
+        nav.glass-nav { display:none !important; }
+
+        /* Sidebar */
+        #dashSidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1rem;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 200;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        #dashSidebar .sidebar-logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        #dashSidebar .sidebar-logo img {
+            height: 40px;
+            mix-blend-mode: lighten;
+            object-fit: contain;
+        }
+        #dashSidebar .sidebar-identity {
+            text-align: center;
+            padding-bottom: 1.25rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        #dashSidebar .sidebar-avatar {
+            width:50px; height:50px; border-radius:50%;
+            background:var(--secondary-color); color:white;
+            font-size:1.3rem; font-weight:700;
+            display:flex; align-items:center; justify-content:center;
+            margin: 0 auto 0.5rem;
+        }
+        #dashSidebar .sidebar-links { display:flex; flex-direction:column; gap:4px; flex:1; }
+        #dashSidebar .sidebar-links a, #dashSidebar .sidebar-logout {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.65rem 0.9rem;
+            border-radius: 10px;
+            color: rgba(255,255,255,0.72);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-family: 'Outfit', sans-serif;
+            transition: background 0.2s, color 0.2s;
+        }
+        #dashSidebar .sidebar-links a:hover { background: rgba(255,255,255,0.08); color:white; }
+        #dashSidebar .sidebar-links a.active { background:rgba(226,114,91,0.22); color:white; font-weight:600; }
+        #dashSidebar .sidebar-links i, #dashSidebar .sidebar-logout i { font-size:1.15rem; }
+        #dashSidebar .sidebar-divider { border:none; border-top:1px solid rgba(255,255,255,0.1); margin: 0.75rem 0; }
+        #dashSidebar .sidebar-logout { color:#ff7675; cursor:pointer; background:none; border:none; width:100%; text-align:left; font-family:'Outfit',sans-serif; font-size:0.88rem; margin-top:0.5rem; }
+        #dashSidebar .sidebar-logout:hover { background:rgba(255,0,0,0.1); }
+
+        /* Main area */
+        #dashMain {
+            margin-left: 240px;
+            min-height: 100vh;
+            padding: 0 2rem 2rem;   /* no top padding — sticky bar handles it */
+            box-sizing: border-box;
+        }
+
+        /* Stats grid */
+        .db-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1.25rem; margin:1.5rem 0 2rem; }
+        .db-stat-box { background:white; border-radius:16px; padding:1.25rem 1.5rem; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+        .db-stat-box i { font-size:1.6rem; color:var(--secondary-color); display:block; margin-bottom:0.4rem; }
+        .db-stat-box p { margin:0; color:#888; font-size:0.82rem; }
+        .db-stat-box h3 { margin:0.2rem 0 0; font-size:1.5rem; color:var(--primary-color); }
+
+        /* Content grid */
+        .db-content-grid { display:grid; grid-template-columns:2fr 1fr; gap:2rem; }
+
+        /* Panel */
+        .db-panel { background:white; border-radius:16px; padding:1.75rem; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+
+        /* Dashboard header — slim sticky top bar */
+        .db-header {
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            background: #f4f6f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0 0.6rem;   /* very slim vertical padding */
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+        }
+        .db-header h2 { margin:0; color:var(--primary-color); font-size:1.15rem; font-weight:700; }
+        .db-header p  { margin:0; color:#999; font-size:0.76rem; line-height:1.3; }
+        .db-header .cta-button { padding:0.4rem 1rem; font-size:0.82rem; }
+        .db-header #avatarInitial { width:32px; height:32px; font-size:0.85rem; }
+
+        /* Edit modal */
+        #editModal {
+            display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+            z-index:9999; align-items:center; justify-content:center;
+        }
+        #editModal.open { display:flex; }
+        #editModalBox {
+            background:white; border-radius:20px; padding:2rem;
+            width:min(520px, 95vw); max-height:90vh; overflow-y:auto;
+            box-shadow:0 20px 60px rgba(0,0,0,0.25);
+        }
+        #editModalBox h3 { color:var(--primary-color); margin-bottom:1.5rem; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== Artisan Sidebar ===== -->
+    <aside id="dashSidebar">
+        <div class="sidebar-logo">
+            <a href="index.html"><img src="assets/images/logo.png" alt="DesiDirect"></a>
+        </div>
+
+        <div class="sidebar-identity">
+            <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+            <div style="color:white;font-weight:600;font-size:0.92rem;" id="sidebarName">Artisan</div>
+            <div style="color:rgba(255,255,255,0.45);font-size:0.73rem;">Producer Account</div>
+        </div>
+
+        <div class="sidebar-links">
+            <a href="producer-dashboard.html" class="active">
+                <i class='bx bx-home-alt'></i> Dashboard
+            </a>
+            <a href="#" onclick="document.getElementById('myProfileSection').scrollIntoView({behavior:'smooth'}); return false;">
+                <i class='bx bx-user-circle'></i> My Profile
+            </a>
+            <a href="#" onclick="document.getElementById('addProductSection').scrollIntoView({behavior:'smooth'}); return false;">
+                <i class='bx bx-plus-circle'></i> Add Product
+            </a>
+            <a href="#" onclick="document.getElementById('myProductsGrid').scrollIntoView({behavior:'smooth'}); return false;">
+                <i class='bx bx-package'></i> My Products
+            </a>
+            <hr class="sidebar-divider">
+            <a href="artisans.html" target="_blank">
+                <i class='bx bx-id-card'></i> My Artisan Listing
+            </a>
+            <a href="marketplace.html" target="_blank">
+                <i class='bx bx-store'></i> View Marketplace
+            </a>
+            <a href="products.html" target="_blank">
+                <i class='bx bx-grid-alt'></i> Customer Catalog
+            </a>
+        </div>
+
+        <button class="sidebar-logout" onclick="logout(event)">
+            <i class='bx bx-log-out'></i> Logout
+        </button>
+    </aside>
+
+    <!-- ===== Main Content ===== -->
+    <main id="dashMain">
+
+            <!-- Header -->
+            <div class="db-header">
+                <div>
+                    <h2 id="dashboardWelcome">Welcome back!</h2>
+                    <p>Manage your products and track your sales.</p>
+                </div>
+                <div style="display:flex; gap:0.75rem; align-items:center;">
+                    <button class="cta-button primary" onclick="document.getElementById('addProductSection').scrollIntoView({behavior:'smooth'})">
+                        <i class='bx bx-plus'></i> Add New Product
+                    </button>
+                    <div id="avatarInitial" style="width:40px;height:40px;background:var(--secondary-color);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;cursor:default;">A</div>
+                    <button onclick="logout(event)" title="Logout" style="display:flex;align-items:center;gap:0.4rem;padding:0.4rem 0.9rem;background:#fff0ee;color:#E2725B;border:1.5px solid #E2725B;border-radius:10px;font-size:0.83rem;font-family:'Outfit',sans-serif;font-weight:600;cursor:pointer;transition:background 0.2s,color 0.2s;" onmouseover="this.style.background='#E2725B';this.style.color='white';" onmouseout="this.style.background='#fff0ee';this.style.color='#E2725B';">
+                        <i class='bx bx-log-out'></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="db-stats">
+                <div class="db-stat-box"><i class='bx bx-wallet'></i><p>Total Earnings</p><h3 id="statEarnings">₹0</h3></div>
+                <div class="db-stat-box"><i class='bx bx-shopping-bag'></i><p>Pending Orders</p><h3>0</h3></div>
+                <div class="db-stat-box"><i class='bx bx-box'></i><p>Active Products</p><h3 id="active-products-count">0</h3></div>
+                <div class="db-stat-box"><i class='bx bx-star'></i><p>Avg Rating</p><h3>4.9/5</h3></div>
+            </div>
+
+            <div class="db-content-grid">
+
+                <!-- Left: My Products + Add Form -->
+                <div>
+
+                    <!-- My Products List -->
+                    <div class="db-panel" style="margin-bottom:2rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                            <h3 style="color:var(--primary-color); margin:0;">My Products</h3>
+                            <span id="myProductsCount" style="font-size:0.85rem; color:#888;">0 listed</span>
+                        </div>
+                        <div id="myProductsGrid"></div>
+                    </div>
+
+                    <!-- My Profile Panel -->
+                    <div class="db-panel" id="myProfileSection" style="margin-bottom:2rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                            <h3 style="color:var(--primary-color);margin:0;">
+                                <i class='bx bx-user-circle' style="color:var(--secondary-color);margin-right:0.4rem;"></i>
+                                My Artisan Profile
+                            </h3>
+                            <a href="artisans.html" target="_blank" style="font-size:0.82rem;color:var(--secondary-color);text-decoration:none;font-weight:600;">
+                                <i class='bx bx-link-external'></i> View on site
+                            </a>
+                        </div>
+                        <p style="font-size:0.85rem;color:#888;margin-bottom:1.25rem;">This info appears on the <strong>Artisans</strong> page for customers to see.</p>
+
+                        <div class="form-group">
+                            <label for="profSpecialty">Specialty / Craft</label>
+                            <input type="text" id="profSpecialty" placeholder="e.g. Master Weaver, Ceramicist, Organic Farmer">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profBio">Bio (shown to customers)</label>
+                            <textarea id="profBio" rows="3" placeholder="Tell your story — your craft, your village, your passion..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profLocation">Location</label>
+                            <input type="text" id="profLocation" placeholder="e.g. Jaipur, Rajasthan">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profAvatar">Profile Photo (optional)</label>
+                            <input type="file" id="profAvatar" accept="image/*" style="padding:0.5rem;">
+                        </div>
+
+                        <button onclick="saveArtisanProfile()" class="cta-button primary" style="width:100%;">
+                            <i class='bx bx-save'></i> Save &amp; Update Public Profile
+                        </button>
+                        <p id="profileSaveMsg" style="text-align:center;margin-top:0.75rem;font-size:0.88rem;color:green;display:none;"></p>
+                    </div>
+
+                    <!-- Add New Product Form -->
+                    <div class="db-panel" id="addProductSection">
+                        <h3 style="margin-bottom:1.5rem; color:var(--primary-color);">Add New Product</h3>
+                        <form id="addProductForm" onsubmit="handleAddProduct(event)">
+                            <div class="form-group">
+                                <label>Product Name</label>
+                                <input type="text" id="prodName" placeholder="Ex: Woven Scarf" required>
+                            </div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                                <div class="form-group">
+                                    <label>Price (₹)</label>
+                                    <input type="number" id="prodPrice" placeholder="0" min="1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Stock</label>
+                                    <input type="number" id="prodStock" placeholder="10" min="0" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="prodCategory">
+                                    <option>Handicrafts</option>
+                                    <option>Organic Food</option>
+                                    <option>Handloom Textiles</option>
+                                    <option>Home Decor</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="prodDesc" rows="3" placeholder="Materials, origin, story..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Product Image</label>
+                                <input type="file" id="prodImage" accept="image/*" style="padding:0.5rem;">
+                            </div>
+                            <button type="submit" id="addProductBtn" class="cta-button primary glow" style="width:100%;">
+                                <i class='bx bx-list-plus'></i> List Product
+                            </button>
+                            <p id="formMsg" style="text-align:center; margin-top:0.75rem; font-size:0.88rem; color:green; display:none;"></p>
+                        </form>
+                    </div>
+
+                </div>
+
+                <!-- Right: Orders -->
+                <div class="db-panel" style="height:fit-content;">
+                    <h3 style="margin-bottom:1.5rem; color:var(--primary-color);">Recent Orders</h3>
+                    <div id="ordersSection">
+                        <div style="text-align:center; padding:2rem 1rem; color:#aaa;">
+                            <i class='bx bx-package' style="font-size:2.5rem; display:block; margin-bottom:0.5rem; opacity:0.4;"></i>
+                            No orders yet
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ============ Edit Modal ============ -->
+    <div id="editModal">
+        <div id="editModalBox">
+            <h3><i class='bx bx-edit'></i> Edit Product</h3>
+            <input type="hidden" id="editProductId">
+            <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" id="editName" required>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form-group">
+                    <label>Price (₹)</label>
+                    <input type="number" id="editPrice" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Stock</label>
+                    <input type="number" id="editStock" min="0" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="editCategory">
+                    <option>Handicrafts</option>
+                    <option>Organic Food</option>
+                    <option>Handloom Textiles</option>
+                    <option>Home Decor</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="editDesc" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Replace Image (optional)</label>
+                <input type="file" id="editImage" accept="image/*" style="padding:0.5rem;">
+            </div>
+            <div style="display:flex; gap:1rem; margin-top:1rem;">
+                <button onclick="saveEdit()" class="cta-button primary" style="flex:1;">Save Changes</button>
+                <button onclick="closeEditModal()" class="cta-button outline" style="flex:1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="glass-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <img src="assets/images/logo.png" alt="DesiDirect" style="height: 120px; width: auto; mix-blend-mode: multiply; object-fit: contain; transform: scale(1.2);">
+                </div>
+                <p>Bringing the soul of rural craftsmanship to the modern world.</p>
+                <div class="social-links">
+                    <a href="#"><i class='bx bxl-instagram'></i></a>
+                    <a href="#"><i class='bx bxl-twitter'></i></a>
+                    <a href="#"><i class='bx bxl-facebook'></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Shop</h4>
+                <a href="products.html">Ceramics</a>
+                <a href="products.html">Textiles</a>
+                <a href="products.html">Home Decor</a>
+                <a href="products.html">Organic Pantry</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="about.html">About Us</a>
+                <a href="artisans.html">Our Artisans</a>
+                <a href="about.html">Sustainability</a>
+                <a href="#">Careers</a>
+            </div>
+            <div class="footer-subscribe">
+                <h4>Stay Connected</h4>
+                <p>Get updates on new collections and artisan stories.</p>
+                <div class="subscribe-form">
+                    <input type="email" placeholder="Your email address">
+                    <button><i class='bx bx-send'></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 DesiDirect Marketplace. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/products.js"></script>
+    <script>
+        // ---- Personalise dashboard from session ----
+        const sessionUser = JSON.parse(localStorage.getItem('desi_user') || '{}');
+        if (sessionUser.name) {
+            document.getElementById('dashboardWelcome').textContent = `Welcome back, ${sessionUser.name.split(' ')[0]}!`;
+            document.getElementById('avatarInitial').textContent    = sessionUser.name.charAt(0).toUpperCase();
+            document.getElementById('sidebarName').textContent       = sessionUser.name;
+            document.getElementById('sidebarAvatar').textContent     = sessionUser.name.charAt(0).toUpperCase();
+        }
+
+        // ── Pre-fill profile form from existing artisan data ──
+        (function prefillProfile() {
+            try {
+                const list = JSON.parse(localStorage.getItem('desi_artisans') || '[]');
+                const me   = list.find(a => a.uid === sessionUser.uid);
+                if (!me) return;
+                if (me.specialty) document.getElementById('profSpecialty').value = me.specialty;
+                if (me.bio)       document.getElementById('profBio').value       = me.bio;
+                if (me.location)  document.getElementById('profLocation').value  = me.location;
+            } catch(e) {}
+        })();
+
+        // ── Save artisan profile to desi_artisans ──
+        function saveArtisanProfile() {
+            const specialty = document.getElementById('profSpecialty').value.trim();
+            const bio       = document.getElementById('profBio').value.trim();
+            const location  = document.getElementById('profLocation').value.trim();
+            const avatarFile = document.getElementById('profAvatar').files[0];
+
+            function doSave(avatarDataUrl) {
+                try {
+                    const list = JSON.parse(localStorage.getItem('desi_artisans') || '[]');
+                    const uid  = sessionUser.uid;
+                    let idx    = list.findIndex(a => a.uid === uid);
+
+                    const profileData = {
+                        uid,
+                        name:      sessionUser.name || 'Artisan',
+                        email:     sessionUser.email || '',
+                        role:      'producer',
+                        specialty: specialty || 'Artisan Craftsperson',
+                        bio:       bio || 'Passionate artisan.',
+                        location:  location || 'India',
+                        joinedAt:  idx >= 0 ? (list[idx].joinedAt || new Date().toISOString()) : new Date().toISOString(),
+                    };
+
+                    if (avatarDataUrl) profileData.avatar = avatarDataUrl;
+                    else if (idx >= 0 && list[idx].avatar) profileData.avatar = list[idx].avatar;
+
+                    if (idx === -1) list.push(profileData);
+                    else list[idx] = { ...list[idx], ...profileData };
+
+                    localStorage.setItem('desi_artisans', JSON.stringify(list));
+
+                    const msg = document.getElementById('profileSaveMsg');
+                    msg.textContent = '✅ Profile updated! It now appears on the Artisans page.';
+                    msg.style.display = 'block';
+                    setTimeout(() => msg.style.display = 'none', 4000);
+                } catch(e) {
+                    alert('Error saving profile: ' + e.message);
+                }
+            }
+
+            if (avatarFile) {
+                const reader = new FileReader();
+                reader.onload = ev => doSave(ev.target.result);
+                reader.readAsDataURL(avatarFile);
+            } else {
+                doSave('');
+            }
+        }
+
+        // Self-contained logout — works regardless of app.js load order
+        function logout(e) {
+            if (e) e.preventDefault();
+            localStorage.removeItem('desi_user');
+            window.location.href = 'index.html';
+        }
+
+        // ---- Refresh the "My Products" panel ----
+        function refreshDashboard() {
+            const products = loadProducts();
+
+            // Filter to this artisan's products (by name match)
+            const myProducts = sessionUser.name
+                ? products.filter(p => p.artisanName === sessionUser.name)
+                : products;
+
+            const grid = document.getElementById('myProductsGrid');
+            renderProductCards(myProducts, grid, 'dashboard');
+
+            document.getElementById('myProductsCount').textContent = `${myProducts.length} listed`;
+            document.getElementById('active-products-count').textContent = myProducts.length;
+
+            // Rough total earnings (price × stock as potential value)
+            const earnings = myProducts.reduce((sum, p) => sum + p.price, 0);
+            document.getElementById('statEarnings').textContent = `₹${earnings.toLocaleString('en-IN')}`;
+        }
+
+        // ---- Add Product ----
+        function handleAddProduct(e) {
+            e.preventDefault();
+            const imageFile = document.getElementById('prodImage').files[0];
+
+            function doAdd(imageDataUrl) {
+                addProduct({
+                    productName:  document.getElementById('prodName').value.trim(),
+                    price:        document.getElementById('prodPrice').value,
+                    stock:        document.getElementById('prodStock').value,
+                    category:     document.getElementById('prodCategory').value,
+                    description:  document.getElementById('prodDesc').value.trim(),
+                    image:        imageDataUrl,
+                    artisanName:  sessionUser.name || 'Local Artisan'
+                });
+
+                document.getElementById('addProductForm').reset();
+                const msg = document.getElementById('formMsg');
+                msg.textContent = '✅ Product listed successfully! It is now visible to customers.';
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 4000);
+                refreshDashboard();
+            }
+
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = ev => doAdd(ev.target.result);
+                reader.readAsDataURL(imageFile);
+            } else {
+                doAdd('');
+            }
+        }
+
+        // ---- Delete ----
+        function confirmDelete(id) {
+            if (confirm('Are you sure you want to delete this product? It will be removed from all customer pages.')) {
+                deleteProduct(id);
+                refreshDashboard();
+            }
+        }
+
+        // ---- Edit Modal ----
+        function openEditModal(id) {
+            const product = loadProducts().find(p => p.id === id);
+            if (!product) return;
+            document.getElementById('editProductId').value = id;
+            document.getElementById('editName').value      = product.productName;
+            document.getElementById('editPrice').value     = product.price;
+            document.getElementById('editStock').value     = product.stock;
+            document.getElementById('editCategory').value  = product.category;
+            document.getElementById('editDesc').value      = product.description;
+            document.getElementById('editModal').classList.add('open');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('open');
+            document.getElementById('editImage').value = '';
+        }
+
+        function saveEdit() {
+            const id        = document.getElementById('editProductId').value;
+            const imageFile = document.getElementById('editImage').files[0];
+
+            function doEdit(imageDataUrl) {
+                const updatedData = {
+                    productName:  document.getElementById('editName').value.trim(),
+                    price:        document.getElementById('editPrice').value,
+                    stock:        document.getElementById('editStock').value,
+                    category:     document.getElementById('editCategory').value,
+                    description:  document.getElementById('editDesc').value.trim()
+                };
+                if (imageDataUrl) updatedData.image = imageDataUrl;
+                editProduct(id, updatedData);
+                closeEditModal();
+                refreshDashboard();
+            }
+
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = ev => doEdit(ev.target.result);
+                reader.readAsDataURL(imageFile);
+            } else {
+                doEdit('');
+            }
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
+
+        // Init
+        refreshDashboard();
+    </script>
+    <script src="js/app.js"></script>
+    <script type="module" src="js/auth-sync.js"></script>
+</body>
+</html>
