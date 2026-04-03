@@ -11,6 +11,20 @@ import {
     signInWithPhoneNumber
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+// ---- Upsert into admin-readable desi_users list ----
+function saveToUsersList(user) {
+    try {
+        const list = JSON.parse(localStorage.getItem('desi_users') || '[]');
+        const idx  = list.findIndex(u => u.id === user.id || u.uid === user.uid);
+        if (idx === -1) {
+            list.push(user);
+        } else {
+            list[idx] = { joinDate: list[idx].joinDate, status: list[idx].status, ...user };
+        }
+        localStorage.setItem('desi_users', JSON.stringify(list));
+    } catch (e) { console.error('saveToUsersList:', e); }
+}
+
 // ---- UI helpers ----
 function showError(msg) {
     const el = document.getElementById('authError');
@@ -103,6 +117,7 @@ async function handleEmailLogin(e) {
         const cred     = await signInWithEmailAndPassword(auth, email, password);
         const userData = extractUserData(cred.user);
         localStorage.setItem('desi_user', JSON.stringify(userData));
+        saveToUsersList({ ...userData, id: userData.uid, joinDate: new Date().toISOString(), status: 'active' });
 
         // ── Keep artisan listing fresh on every login ──
         if (userData.role === 'producer') {
@@ -138,6 +153,7 @@ async function handleGoogleLogin() {
         const result   = await signInWithPopup(auth, googleProvider);
         const userData = extractUserData(result.user);
         localStorage.setItem('desi_user', JSON.stringify(userData));
+        saveToUsersList({ ...userData, id: userData.uid, joinDate: new Date().toISOString(), status: 'active' });
         redirectByRole(userData.role);
     } catch (err) {
         setLoading('googleLoginBtn', false, '  Log in with Google');
@@ -196,6 +212,7 @@ async function handleVerifyOTP() {
         const result   = await confirmationResult.confirm(otp);
         const userData = extractUserData(result.user);
         localStorage.setItem('desi_user', JSON.stringify(userData));
+        saveToUsersList({ ...userData, id: userData.uid, joinDate: new Date().toISOString(), status: 'active' });
         redirectByRole(userData.role);
     } catch (err) {
         setLoading('verifyOTPBtn', false, 'Verify & Login');

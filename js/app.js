@@ -1,3 +1,76 @@
+// ═══════════════════════════════════════════════
+//  Global Utilities — runs on every page
+// ═══════════════════════════════════════════════
+
+// ── Live Cart Badge ──────────────────────────────
+function updateCartBadges() {
+    try {
+        const cart     = JSON.parse(localStorage.getItem('desi_cart') || '[]');
+        const totalQty = cart.reduce((s, i) => s + (i.qty || 1), 0);
+        document.querySelectorAll('.nav-cart-badge').forEach(badge => {
+            badge.textContent   = totalQty || '';
+            badge.style.display = totalQty > 0 ? 'flex' : 'none';
+        });
+    } catch (e) {}
+}
+// Run on load and after storage changes (e.g. from another tab)
+updateCartBadges();
+window.addEventListener('storage', updateCartBadges);
+
+// ── Floating Back Button ─────────────────────────
+(function injectBackButton() {
+    // Don't show on home page
+    if (window.location.pathname.endsWith('index.html') ||
+        window.location.pathname === '/' ||
+        window.location.pathname === '') return;
+
+    const btn = document.createElement('button');
+    btn.id        = 'floatingBackBtn';
+    btn.title     = 'Go back';
+    btn.innerHTML = "<i class='bx bx-arrow-back'></i>";
+    btn.style.cssText = [
+        'position:fixed',
+        'bottom:2rem',
+        'left:2rem',
+        'z-index:9999',
+        'width:48px',
+        'height:48px',
+        'border-radius:50%',
+        'border:none',
+        'background:var(--primary-color, #2F4F4F)',
+        'color:white',
+        'font-size:1.3rem',
+        'display:flex',
+        'align-items:center',
+        'justify-content:center',
+        'cursor:pointer',
+        'box-shadow:0 4px 20px rgba(0,0,0,0.25)',
+        'transition:transform 0.2s,box-shadow 0.2s,opacity 0.3s',
+        'opacity:0',
+        'pointer-events:none',
+    ].join(';');
+
+    document.body.appendChild(btn);
+
+    // Show only when there's history to go back to
+    if (history.length > 1) {
+        setTimeout(() => {
+            btn.style.opacity        = '1';
+            btn.style.pointerEvents  = 'auto';
+        }, 400);
+    }
+
+    btn.addEventListener('click', () => history.back());
+    btn.addEventListener('mouseenter', () => {
+        btn.style.transform  = 'scale(1.1)';
+        btn.style.boxShadow  = '0 6px 28px rgba(0,0,0,0.35)';
+    });
+    btn.addEventListener('mouseleave', () => {
+        btn.style.transform  = 'scale(1)';
+        btn.style.boxShadow  = '0 4px 20px rgba(0,0,0,0.25)';
+    });
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
     // ---- 1. Navigation Scroll Effect ----
     const nav = document.querySelector('nav');

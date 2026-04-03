@@ -12,6 +12,25 @@ import {
     signInWithPhoneNumber
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+// ---- Save user to the admin-readable desi_users list ----
+function saveToUsersList(user) {
+    try {
+        const list = JSON.parse(localStorage.getItem('desi_users') || '[]');
+        const idx  = list.findIndex(u => u.id === user.id || u.uid === user.uid);
+        if (idx === -1) {
+            list.push(user);
+        } else {
+            // Update existing entry but keep original joinDate & status
+            list[idx] = { joinDate: list[idx].joinDate, status: list[idx].status, ...user };
+        }
+        localStorage.setItem('desi_users', JSON.stringify(list));
+    } catch (e) {
+        console.error('saveToUsersList error:', e);
+    }
+}
+
+
+
 // ---- UI helpers ----
 function showError(msg) {
     const el = document.getElementById('authError');
@@ -82,6 +101,9 @@ async function handleEmailSignup(e) {
         const userData = { uid: cred.user.uid, name, email: cred.user.email, role };
         localStorage.setItem('desi_user', JSON.stringify(userData));
 
+        // ── Save to desi_users so Admin Portal can see this user ──
+        saveToUsersList({ ...userData, id: cred.user.uid, joinDate: new Date().toISOString(), status: 'active' });
+
         // ── Register artisan profile so it appears on artisans.html ──
         if (role === 'producer') {
             const artisanData = {
@@ -133,6 +155,10 @@ async function handleGoogleSignup() {
 
         const userData = { uid: user.uid, name, email: user.email, role };
         localStorage.setItem('desi_user', JSON.stringify(userData));
+
+        // ── Save to desi_users so Admin Portal can see this user ──
+        saveToUsersList({ ...userData, id: user.uid, joinDate: new Date().toISOString(), status: 'active' });
+
         window.location.href = 'marketplace.html';
     } catch (err) {
         setLoading('googleSignupBtn', false, '  Sign up with Google');
@@ -199,6 +225,9 @@ async function handleVerifyOTP() {
 
         const userData = { uid: user.uid, name, email: user.email || '', role };
         localStorage.setItem('desi_user', JSON.stringify(userData));
+
+        // ── Save to desi_users so Admin Portal can see this user ──
+        saveToUsersList({ ...userData, id: user.uid, joinDate: new Date().toISOString(), status: 'active' });
 
         // ── Register artisan profile so it appears on artisans.html ──
         if (role === 'producer') {

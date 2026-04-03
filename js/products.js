@@ -197,11 +197,7 @@ function addToCart(productId) {
         }, 1200);
     }
 
-    // Update nav badge across pages
-    const totalQty = cart.reduce((s, i) => s + i.qty, 0);
-    document.querySelectorAll('nav .nav-actions a span').forEach(badge => {
-        badge.textContent   = totalQty;
-        badge.style.display = totalQty > 0 ? 'flex' : 'none';
-    });
+    // Update nav badge (global helper from app.js)
+    if (typeof updateCartBadges === 'function') updateCartBadges();
 }
 
