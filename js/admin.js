@@ -344,12 +344,30 @@ function renderProducts(search = '') {
 }
 
 function approveProduct(id) {
-    DB.saveProducts(DB.products().map(p => p.id===id ? {...p, status:'approved'} : p));
+    const products = DB.products();
+    const product = products.find(p => p.id === id);
+    if (product && product._docId) {
+        fetch(`http://localhost:5000/api/products/${product._docId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'approved' })
+        }).catch(err => console.error(err));
+    }
+    DB.saveProducts(products.map(p => p.id===id ? {...p, status:'approved'} : p));
     renderProducts(); toast('Product approved.', 'success');
 }
 function removeProduct(id, name) {
     confirm2('Remove Product', `Remove "<b>${name}</b>" from the platform?`, () => {
-        DB.saveProducts(DB.products().map(p => p.id===id ? {...p, status:'removed'} : p));
+        const products = DB.products();
+        const product = products.find(p => p.id === id);
+        if (product && product._docId) {
+            fetch(`http://localhost:5000/api/products/${product._docId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'removed' })
+            }).catch(err => console.error(err));
+        }
+        DB.saveProducts(products.map(p => p.id===id ? {...p, status:'removed'} : p));
         renderProducts(); toast('Product removed.', 'warning');
     });
 }

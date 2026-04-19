@@ -122,6 +122,12 @@ async function handleEmailSignup(e) {
                     const idx  = list.findIndex(a => a.uid === artisanData.uid);
                     if (idx === -1) list.push(artisanData); else list[idx] = artisanData;
                     localStorage.setItem('desi_artisans', JSON.stringify(list));
+                    
+                    fetch('http://localhost:5000/api/artisans', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(artisanData)
+                    }).catch(e => console.error(e));
                 } catch (e) { console.error('Artisan save error:', e); }
             }
         }

@@ -22,6 +22,19 @@ function saveArtisans(list) {
     localStorage.setItem(ARTISANS_KEY, JSON.stringify(list));
 }
 
+async function loadArtisansFromAPI() {
+    try {
+        const res = await fetch('http://localhost:5000/api/artisans');
+        if (!res.ok) throw new Error('Network response was not ok');
+        const artisans = await res.json();
+        saveArtisans(artisans);
+        return artisans;
+    } catch (err) {
+        console.error('API fetch error:', err);
+        return loadArtisans();
+    }
+}
+
 /** Register or update a producer profile in the artisans list */
 function registerArtisanProfile(userData) {
     if (!userData || userData.role !== 'producer') return;
@@ -45,6 +58,14 @@ function registerArtisanProfile(userData) {
     } else {
         list[idx] = { ...list[idx], ...profile }; // merge — preserve extra fields
     }
+
+    try {
+        fetch('http://localhost:5000/api/artisans', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(profile)
+        });
+    } catch (e) { console.error('Error saving artisan to API', e); }
 
     saveArtisans(list);
 }
@@ -109,11 +130,11 @@ function viewArtisanProducts(uid, name) {
 }
 
 /** Main render function — called on artisans.html load */
-function renderDynamicArtisans() {
+async function renderDynamicArtisans() {
     const grid = document.getElementById('artisans-dynamic-grid');
     if (!grid) return;
 
-    const artisans = loadArtisans();
+    const artisans = await loadArtisansFromAPI();
 
     if (artisans.length === 0) {
         // Show a "be first" placeholder

@@ -481,7 +481,7 @@
 
     <script>
         const CART_KEY     = 'desi_cart';
-        const SHIPPING_FEE = 80;
+        const SHIPPING_FEE = 0;
 
         // ── Load real cart from localStorage ──
         function getCart() {
@@ -589,7 +589,7 @@
         }
 
         // ── Cash on Delivery ──
-        function handleCOD() {
+        async function handleCOD() {
             const cart = getCart();
             if (cart.length === 0) return;
 
@@ -598,41 +598,22 @@
             let user = {};
             try { user = JSON.parse(localStorage.getItem('desi_user') || '{}'); } catch(e) {}
 
-            const orderId = 'ORD-' + Date.now();
-
-            // Save order
-            const orders = JSON.parse(localStorage.getItem('desi_orders') || '[]');
-            orders.push({
-                id:            orderId,
-                customerId:    user.id || '',
-                customerName:  user.name || 'Guest',
-                items:         cart,
-                total:         totalINR,
-                status:        'processing',
-                paymentStatus: 'cod_pending',
-                paymentMethod: 'cod',
-                date:          Date.now()
-            });
-            localStorage.setItem('desi_orders', JSON.stringify(orders));
-
-            // Save payment record
-            const payments = JSON.parse(localStorage.getItem('desi_payments') || '[]');
-            payments.push({
-                id:           'COD-' + Date.now(),
-                orderId:      orderId,
-                customerId:   user.id || '',
-                customerName: user.name || 'Guest',
-                amount:       totalINR,
-                method:       'cod',
-                status:       'pending',
-                date:         Date.now()
-            });
-            localStorage.setItem('desi_payments', JSON.stringify(payments));
+            try {
+                await fetch('http://localhost:5000/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: user.uid || user.id || 'guest',
+                        items: cart,
+                        totalAmount: totalINR,
+                        paymentStatus: 'COD_Pending',
+                        paymentMethod: 'COD'
+                    })
+                });
+            } catch(e) { console.error('Failed to save COD order:', e); }
 
             // Clear cart & show success
             localStorage.removeItem('desi_cart');
-
-            // Customise the success overlay for COD
             document.querySelector('.success-box h3').textContent = 'Order Confirmed!';
             document.querySelector('.success-box p').textContent  =
                 'Your COD order has been placed. Pay in cash when it arrives. 🛵';
@@ -640,93 +621,101 @@
         }
 
         // ── Razorpay (UPI QR / Card / Netbanking / Wallet) ──
-        function handleRazorpay() {
+        async function handleRazorpay() {
             const cart = getCart();
             if (cart.length === 0) return;
 
             const subtotal   = getSubtotal(cart);
             const totalINR   = subtotal + SHIPPING_FEE;
-            const totalPaise = totalINR * 100;   // Razorpay uses paise
+            const totalPaise = totalINR * 100;
 
             let user = {};
             try { user = JSON.parse(localStorage.getItem('desi_user') || '{}'); } catch(e) {}
 
-            // Build Razorpay options
-            // NOTE: No custom config.display needed — Razorpay's standard modal
-            // already shows UPI (with QR scan), Card, Netbanking, and Wallet tabs.
-            const options = {
-                key:         RAZORPAY_KEY,
-                amount:      totalPaise,
-                currency:    'INR',
-                name:        'DesiDirect',
-                description: `Order of ${cart.length} item(s)`,
-                image:       'assets/images/logo.png',
-
-                prefill: {
-                    name:    user.name  || '',
-                    email:   user.email || '',
-                    contact: user.phone || ''
-                },
-
-                theme: { color: '#2F4F4F' },
-
-                handler: function(response) {
-                    const orderId = 'ORD-' + Date.now();
-                    const payId   = response.razorpay_payment_id;
-
-                    const orders = JSON.parse(localStorage.getItem('desi_orders') || '[]');
-                    orders.push({
-                        id:            orderId,
-                        customerId:    user.id || '',
-                        customerName:  user.name || 'Guest',
-                        items:         cart,
-                        total:         totalINR,
-                        status:        'processing',
-                        paymentStatus: 'paid',
-                        paymentMethod: activeMethod,
-                        razorpayId:    payId,
-                        date:          Date.now()
-                    });
-                    localStorage.setItem('desi_orders', JSON.stringify(orders));
-
-                    const payments = JSON.parse(localStorage.getItem('desi_payments') || '[]');
-                    payments.push({
-                        id:           payId,
-                        orderId:      orderId,
-                        customerId:   user.id || '',
-                        customerName: user.name || 'Guest',
-                        amount:       totalINR,
-                        method:       activeMethod,
-                        status:       'success',
-                        date:         Date.now()
-                    });
-                    localStorage.setItem('desi_payments', JSON.stringify(payments));
-
-                    localStorage.removeItem('desi_cart');
-                    document.getElementById('successOverlay').classList.add('show');
-                },
-
-                modal: {
-                    ondismiss: function() {
-                        const btn = document.getElementById('payBtn');
-                        btn.disabled  = false;
-                        btn.innerHTML = '<i class="bx bx-lock-alt"></i> Pay <span id="payBtnAmount">' +
-                            '₹' + totalINR.toLocaleString('en-IN') + '.00</span>';
-                    }
-                }
-            };
-
             const btn = document.getElementById('payBtn');
             btn.disabled  = true;
-            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Opening Razorpay…';
+            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Loading…';
 
-            const rzp = new Razorpay(options);
-            rzp.on('payment.failed', function(resp) {
-                alert('Payment failed: ' + resp.error.description);
+            try {
+                // Fetch configuration
+                const keyRes = await fetch('http://localhost:5000/api/payment/key');
+                const keyData = await keyRes.json();
+                
+                // Fetch Order ID
+                const orderRes = await fetch('http://localhost:5000/api/payment/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: totalPaise })
+                });
+                const rzrOrder = await orderRes.json();
+
+                const options = {
+                    key:         keyData.key,
+                    amount:      totalPaise,
+                    currency:    'INR',
+                    name:        'DesiDirect',
+                    description: `Order of ${cart.length} item(s)`,
+                    image:       'assets/images/logo.png',
+                    order_id:    rzrOrder.id, // The real razorpay order ID
+
+                    prefill: {
+                        name:    user.name  || '',
+                        email:   user.email || '',
+                        contact: user.phone || ''
+                    },
+                    theme: { color: '#2F4F4F' },
+
+                    handler: async function(response) {
+                        try {
+                            const verifyRes = await fetch('http://localhost:5000/api/payment/verify-signature', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(response)
+                            });
+                            const verifyResult = await verifyRes.json();
+
+                            if (verifyResult.success) {
+                                await fetch('http://localhost:5000/api/orders', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        userId: user.uid || user.id || 'guest',
+                                        items: cart,
+                                        totalAmount: totalINR,
+                                        paymentStatus: 'Paid',
+                                        paymentMethod: activeMethod
+                                    })
+                                });
+                                localStorage.removeItem('desi_cart');
+                                document.getElementById('successOverlay').classList.add('show');
+                            } else {
+                                alert('Payment verification failed!');
+                                btn.disabled  = false;
+                                btn.innerHTML = '<i class="bx bx-lock-alt"></i> Pay ₹' + totalINR.toLocaleString('en-IN') + '.00';
+                            }
+                        } catch(err) { console.error('Verification error:', err); }
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            btn.disabled  = false;
+                            btn.innerHTML = '<i class="bx bx-lock-alt"></i> Pay <span id="payBtnAmount">₹' + totalINR.toLocaleString('en-IN') + '.00</span>';
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.on('payment.failed', function(resp) {
+                    alert('Payment failed: ' + resp.error.description);
+                    btn.disabled  = false;
+                    btn.innerHTML = '<i class="bx bx-lock-alt"></i> Pay ₹' + totalINR.toLocaleString('en-IN') + '.00';
+                });
+                rzp.open();
+            } catch(e) {
+                console.error(e);
+                alert('Initialization failed. Retrying...');
                 btn.disabled  = false;
                 btn.innerHTML = '<i class="bx bx-lock-alt"></i> Pay ₹' + totalINR.toLocaleString('en-IN') + '.00';
-            });
-            rzp.open();
+            }
         }
 
         // ── Clear cart after success ──

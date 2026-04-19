@@ -31,35 +31,30 @@ function loadProducts() {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// loadProductsFromFirestore()
-// Returns a Promise<Array> of all approved/active products from Firestore.
+// loadProductsFromFirestore() -> loadProductsFromAPI()
+// Returns a Promise<Array> of all approved/active products from API.
 // Also refreshes the local cache so offline/late loads still work.
 // ────────────────────────────────────────────────────────────────────────────
 async function loadProductsFromFirestore(filterArtisan) {
-    const fs = _getFS();
-    if (!fs) {
-        // Firebase not available – fall back to cache
-        console.warn('Firestore unavailable, using localStorage cache.');
-        let cached = _cacheGet();
-        if (filterArtisan) cached = cached.filter(p => p.artisanName === filterArtisan);
-        return cached;
-    }
-
     try {
-        let query = fs.collection('products').orderBy('uploadedAt', 'desc');
-        if (filterArtisan) query = query.where('artisanName', '==', filterArtisan);
-
-        const snap = await query.get();
-        const products = snap.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
-
-        // Keep local cache fresh
-        if (!filterArtisan) _cacheSet(products);
-
-        return products;
+        const res = await fetch('http://localhost:5000/api/products');
+        if (!res.ok) throw new Error('Network response was not ok');
+        const products = await res.json();
+        
+        console.log('[DesiDirect] Loaded', products.length, 'products from API.');
+        
+        let filtered = products;
+        if (filterArtisan) {
+            filtered = products.filter(p => p.artisanName === filterArtisan);
+        } else {
+            _cacheSet(products);
+        }
+        return filtered;
     } catch (err) {
-        console.error('Firestore read error:', err);
-        // Fall back to cache
-        return _cacheGet();
+        console.error('[DesiDirect] API read error:', err.message);
+        const cached = _cacheGet();
+        if (filterArtisan) return cached.filter(p => p.artisanName === filterArtisan);
+        return cached;
     }
 }
 
@@ -100,15 +95,19 @@ async function addProduct(data) {
         uploadedAt:   nowISO
     };
 
-    // ── Write to Firestore (shared) ──
-    const fs = _getFS();
-    if (fs) {
-        try {
-            const ref = await fs.collection('products').add(product);
-            product._docId = ref.id;
-        } catch(err) {
-            console.error('Firestore write error:', err);
+    // ── Write to API (shared) ──
+    try {
+        const res = await fetch('http://localhost:5000/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product)
+        });
+        if (res.ok) {
+            const savedProduct = await res.json();
+            product._docId = savedProduct._id;
         }
+    } catch(err) {
+        console.error('API write error:', err);
     }
 
     // ── Also update localStorage cache ──
@@ -126,22 +125,23 @@ async function addProduct(data) {
 async function deleteProduct(id) {
     const numId = parseInt(id);
 
-    // ── Delete from Firestore ──
-    const fs = _getFS();
-    if (fs) {
+    // ── Find product _docId from cache ──
+    const cache = _cacheGet();
+    const product = cache.find(p => p.id === numId);
+
+    // ── Delete from API ──
+    if (product && product._docId) {
         try {
-            // Find doc by numeric id
-            const snap = await fs.collection('products').where('id', '==', numId).get();
-            for (const doc of snap.docs) {
-                await doc.ref.delete();
-            }
+            await fetch(`http://localhost:5000/api/products/${product._docId}`, {
+                method: 'DELETE'
+            });
         } catch(err) {
-            console.error('Firestore delete error:', err);
+            console.error('API delete error:', err);
         }
     }
 
     // ── Remove from cache ──
-    _cacheSet(_cacheGet().filter(p => p.id !== numId));
+    _cacheSet(cache.filter(p => p.id !== numId));
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -162,21 +162,25 @@ async function editProduct(id, updatedData) {
         editedAt: new Date().toISOString()
     };
 
-    // ── Update in Firestore ──
-    const fs = _getFS();
-    if (fs) {
+    // ── Find product _docId from cache ──
+    const cache = _cacheGet();
+    const product = cache.find(p => p.id === numId);
+
+    // ── Update in API ──
+    if (product && product._docId) {
         try {
-            const snap = await fs.collection('products').where('id', '==', numId).get();
-            for (const doc of snap.docs) {
-                await doc.ref.update(patch);
-            }
+            await fetch(`http://localhost:5000/api/products/${product._docId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(patch)
+            });
         } catch(err) {
-            console.error('Firestore update error:', err);
+            console.error('API update error:', err);
         }
     }
 
     // ── Update in cache ──
-    _cacheSet(_cacheGet().map(p => {
+    _cacheSet(cache.map(p => {
         if (p.id !== numId) return p;
         return { ...p, ...patch };
     }));

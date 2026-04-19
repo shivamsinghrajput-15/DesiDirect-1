@@ -203,9 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const path = window.location.pathname;
                 const pageName = path.split('/').pop() || 'index.html';
 
+                // Pages that are ONLY for customers (not for producers/admins to visit)
+                // Note: products.html & marketplace.html are BROWSABLE by producers too
                 const customerOnlyPages = [
-                    'marketplace.html', 'cart.html', 'checkout.html',
-                    'products.html', 'product-details.html',
+                    'cart.html', 'checkout.html',
                     'payment.html', 'confirmation.html'
                 ];
                 const producerOnlyPages = ['producer-dashboard.html'];
